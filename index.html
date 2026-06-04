@@ -639,12 +639,13 @@ function onDM(e){
   }
   const shotAngle=Math.atan2(dy,dx)*180/Math.PI;
   updateWindRelation(shotAngle);
+  // Readout anchored to golf ball origin — not following finger
   const rd=document.getElementById('measure-readout');
-  rd.style.left=x+'px';rd.style.top=y+'px';
+  rd.style.left=S.dragStart.x+'px';rd.style.top=(S.dragStart.y-20)+'px';
   rd.classList.add('show');
   if(S.mode==='photo') rd.classList.add('photo-mode'); else rd.classList.remove('photo-mode');
   document.getElementById('measure-num').textContent=yards;
-  document.getElementById('measure-unit').textContent='YARDS';
+  document.getElementById('measure-unit').textContent='YDS';
   document.getElementById('measure-sub').textContent=S.mode==='golf'?suggestClub(yards):suggestFocal(yards);
 }
 function onDE(){
