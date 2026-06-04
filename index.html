@@ -305,6 +305,123 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Raleway',sans-seri
 #toast.photo-toast{background:rgba(8,8,20,0.95);color:var(--photo-accent);border:1px solid rgba(96,165,250,0.15);}
 #toast.neutral-toast{background:rgba(10,10,14,0.95);color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.08);}
 
+/* ── BETA AGREEMENT ── */
+#beta-overlay{
+  position:fixed;inset:0;z-index:99999;
+  background:radial-gradient(ellipse at 50% 30%, #0a1f0a 0%, #060606 70%);
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;
+}
+#beta-overlay::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(rgba(134,239,172,0.015) 1px,transparent 1px),
+             linear-gradient(90deg,rgba(134,239,172,0.015) 1px,transparent 1px);
+  background-size:40px 40px;
+}
+.beta-card{
+  background:rgba(6,10,6,0.96);
+  border:1px solid rgba(134,239,172,0.15);
+  border-radius:24px;max-width:380px;width:100%;
+  max-height:88vh;display:flex;flex-direction:column;
+  overflow:hidden;
+  box-shadow:0 0 60px rgba(134,239,172,0.08),0 8px 40px rgba(0,0,0,0.7);
+  position:relative;z-index:1;
+}
+.beta-header{
+  background:linear-gradient(160deg,#0a1f0a,#060e06);
+  padding:20px 20px 16px;
+  border-bottom:1px solid rgba(134,239,172,0.1);
+  text-align:center;
+}
+.beta-flag-row{
+  display:flex;justify-content:center;gap:8px;margin-bottom:12px;
+}
+.beta-flag{
+  width:3px;height:20px;background:rgba(134,239,172,0.3);border-radius:2px;
+  animation:flagWave 2s ease-in-out infinite;
+}
+.beta-flag:nth-child(2){animation-delay:.15s;}
+.beta-flag:nth-child(3){animation-delay:.3s;}
+.beta-flag:nth-child(4){animation-delay:.45s;}
+.beta-flag:nth-child(5){animation-delay:.6s;}
+@keyframes flagWave{0%,100%{transform:scaleY(1);opacity:0.3;}50%{transform:scaleY(1.4);opacity:0.8;}}
+.beta-eyemark{
+  font-family:'Cinzel',serif;font-size:11px;font-weight:600;
+  color:rgba(134,239,172,0.7);letter-spacing:4px;
+  text-transform:uppercase;margin-bottom:4px;
+}
+.beta-title{
+  font-family:'Cinzel',serif;font-size:22px;font-weight:700;
+  color:var(--accent);letter-spacing:3px;margin-bottom:2px;
+}
+.beta-subtitle{
+  font-family:'Oswald',sans-serif;font-size:10px;
+  color:rgba(134,239,172,0.55);letter-spacing:3px;
+}
+.beta-scroll{
+  overflow-y:scroll;padding:18px 20px;flex:1;
+  scrollbar-width:thin;scrollbar-color:rgba(134,239,172,0.2) transparent;
+}
+.beta-section-title{
+  font-family:'Cinzel',serif;font-size:11px;font-weight:700;
+  color:var(--accent);letter-spacing:2px;
+  margin:14px 0 4px;display:flex;align-items:center;gap:6px;
+}
+.beta-section-title::before{
+  content:'';display:inline-block;width:16px;height:1px;
+  background:rgba(134,239,172,0.4);
+}
+.beta-text{
+  font-family:'Raleway',sans-serif;font-size:12px;font-weight:500;
+  color:rgba(255,255,255,0.72);line-height:1.7;margin-bottom:4px;
+}
+.beta-footer-note{
+  font-size:10px;color:rgba(134,239,172,0.4);
+  font-family:'Oswald',sans-serif;letter-spacing:1px;
+  text-align:center;margin-top:14px;padding-top:12px;
+  border-top:1px solid rgba(134,239,172,0.08);
+}
+.beta-bottom{
+  padding:16px 20px;
+  border-top:1px solid rgba(134,239,172,0.1);
+  background:rgba(4,8,4,0.98);
+  display:flex;flex-direction:column;gap:10px;
+}
+.beta-name-input{
+  width:100%;background:rgba(134,239,172,0.06);
+  border:1px solid rgba(134,239,172,0.2);border-radius:12px;
+  color:var(--white);font-family:'Raleway',sans-serif;
+  font-size:15px;font-weight:600;padding:12px 14px;outline:none;
+  transition:border-color .2s;
+}
+.beta-name-input:focus{border-color:rgba(134,239,172,0.45);}
+.beta-name-input::placeholder{color:rgba(134,239,172,0.3);}
+.beta-check-row{
+  display:flex;align-items:center;gap:10px;
+  opacity:0.35;transition:opacity .3s;cursor:default;
+}
+.beta-check-row.ready{opacity:1;cursor:pointer;}
+.beta-check-row input{width:18px;height:18px;accent-color:var(--accent);cursor:pointer;}
+.beta-check-label{
+  font-family:'Raleway',sans-serif;font-size:12px;font-weight:600;
+  color:rgba(255,255,255,0.85);
+}
+.beta-agree-btn{
+  width:100%;padding:15px;border:none;border-radius:14px;
+  background:rgba(134,239,172,0.08);
+  color:rgba(134,239,172,0.3);
+  font-family:'Cinzel',serif;font-size:16px;font-weight:700;
+  letter-spacing:3px;cursor:not-allowed;
+  border:1px solid rgba(134,239,172,0.1);
+  transition:all .3s;
+}
+.beta-agree-btn.ready{
+  background:rgba(134,239,172,0.12);color:var(--accent);
+  border-color:rgba(134,239,172,0.3);cursor:pointer;
+  box-shadow:0 0 20px rgba(134,239,172,0.08);
+}
+.beta-agree-btn.ready:active{transform:scale(0.98);}
+
 @keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
 @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
 @keyframes wordPulse{0%,100%{opacity:0.18;filter:none;}40%,60%{opacity:1;filter:drop-shadow(0 0 8px currentColor);}}
@@ -322,6 +439,62 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Raleway',sans-seri
 </style>
 </head>
 <body>
+
+<!-- ═══ BETA AGREEMENT ═══ -->
+<div id="beta-overlay" style="display:none;">
+  <div class="beta-card">
+    <div class="beta-header">
+      <div class="beta-flag-row">
+        <div class="beta-flag"></div><div class="beta-flag"></div>
+        <div class="beta-flag"></div><div class="beta-flag"></div>
+        <div class="beta-flag"></div>
+      </div>
+      <div class="beta-eyemark">👁 Third Eye</div>
+      <div class="beta-title">BETA TESTER</div>
+      <div class="beta-subtitle">Confidential Field Agreement</div>
+    </div>
+    <div class="beta-scroll" id="beta-scroll" onscroll="onBetaScroll(this)">
+      <div class="beta-text" style="color:rgba(134,239,172,0.5);font-family:'Cinzel',serif;font-size:11px;letter-spacing:1px;">
+        Welcome to the fairway. You've been personally selected to test Third Eye before it goes to market. By continuing you agree to the following:
+      </div>
+
+      <div class="beta-section-title">1. Confidentiality</div>
+      <div class="beta-text">This app is pre-release software. Do not share the link, screenshots, or descriptions of its features with anyone outside this authorized testing group without written permission from the creator.</div>
+
+      <div class="beta-section-title">2. Ownership</div>
+      <div class="beta-text">Third Eye — including all concepts, designs, workflows, measurement systems, and visual identity — is the original creative work of its creator. Nothing in this agreement transfers any ownership or rights to you.</div>
+
+      <div class="beta-section-title">3. Feedback</div>
+      <div class="beta-text">Any feedback you provide may be used to improve the app. You will not receive compensation, but your contribution to making this better is genuinely appreciated. Especially from someone who actually plays.</div>
+
+      <div class="beta-section-title">4. No Warranties</div>
+      <div class="beta-text">This is beta software provided as-is. Distance measurements are GPS-based estimates. Always use your own judgment on the course. The creator is not responsible for that three-putt.</div>
+
+      <div class="beta-section-title">5. Data & Privacy</div>
+      <div class="beta-text">Third Eye does not collect, store, or transmit any personal data to any server. All club distances, course names, and preferences are saved only on your device. GPS is used locally and in real time only.</div>
+
+      <div class="beta-section-title">6. Term</div>
+      <div class="beta-text">This agreement applies for the duration of the beta testing period and survives its conclusion with respect to confidentiality.</div>
+
+      <div class="beta-footer-note">
+        Third Eye is an independent product. Not affiliated with any golf association, course, or equipment manufacturer.<br/>
+        © 2025 Third Eye. All Rights Reserved. Now go play. ⛳
+      </div>
+    </div>
+    <div class="beta-bottom">
+      <input class="beta-name-input" id="beta-name" type="text"
+             placeholder="Your full name..." maxlength="40"
+             oninput="onBetaNameInput()"/>
+      <label class="beta-check-row" id="beta-check-row">
+        <input type="checkbox" id="beta-check" disabled onchange="onBetaCheck()"/>
+        <span class="beta-check-label">I have read and agree to the terms above</span>
+      </label>
+      <button class="beta-agree-btn" id="beta-agree-btn" onclick="submitBeta()">
+        TEE IT UP ⛳
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- ═══ SPLASH ═══ -->
 <div id="splash">
@@ -730,6 +903,54 @@ const S = {
 
 let map, gpsMarker, SVG;
 
+// ═══ BETA AGREEMENT ═══
+function checkBeta(){
+  if(!localStorage.getItem('te-beta-agreed')){
+    document.getElementById('beta-overlay').style.display='flex';
+  }
+}
+function onBetaScroll(el){
+  if(el.scrollTop+el.clientHeight>=el.scrollHeight-20){
+    const chk=document.getElementById('beta-check');
+    const row=document.getElementById('beta-check-row');
+    chk.disabled=false;
+    row.classList.add('ready');
+  }
+}
+function onBetaNameInput(){
+  const name=document.getElementById('beta-name').value.trim();
+  const chk=document.getElementById('beta-check');
+  if(name.length>1&&!chk.disabled) onBetaCheck();
+}
+function onBetaCheck(){
+  const checked=document.getElementById('beta-check').checked;
+  const name=document.getElementById('beta-name').value.trim();
+  const btn=document.getElementById('beta-agree-btn');
+  if(checked&&name.length>1){
+    btn.classList.add('ready');
+  } else {
+    btn.classList.remove('ready');
+  }
+}
+function submitBeta(){
+  const name=document.getElementById('beta-name').value.trim();
+  if(!name){
+    const inp=document.getElementById('beta-name');
+    inp.style.borderColor='rgba(239,68,68,0.5)';
+    inp.focus();return;
+  }
+  if(!document.getElementById('beta-check').checked) return;
+  const date=new Date().toLocaleString();
+  const ua=navigator.userAgent;
+  const device=/iPhone/.test(ua)?'iPhone':/iPad/.test(ua)?'iPad':/Android/.test(ua)?'Android':'Browser';
+  localStorage.setItem('te-beta-agreed',JSON.stringify({name,date,device}));
+  document.getElementById('beta-overlay').style.display='none';
+  // Email notification
+  const subject=encodeURIComponent('Third Eye Beta Agreement — '+name);
+  const body=encodeURIComponent(name+' agreed to the Third Eye Beta Tester Agreement on '+date+'. Device: '+device+'.');
+  setTimeout(()=>{window.location.href='mailto:bmckennavo@gmail.com?subject='+subject+'&body='+body;},400);
+}
+
 // ═══ START ═══
 function startApp(){
   document.getElementById('splash').style.display='none';
@@ -789,7 +1010,19 @@ function onGPS(lat,lng){
   }
   drawGPSMarker();
 }
-function recenter(){S.userPanned=false;if(S.gpsPos)map.setView([S.gpsPos.lat,S.gpsPos.lng],map.getZoom(),{animate:true});}
+function recenter(){
+  S.userPanned=false;
+  if(!S.gpsPos)return;
+  const zoom=map.getZoom();
+  // Always offset GPS to bottom quarter of screen
+  map.setView([S.gpsPos.lat,S.gpsPos.lng],zoom,{animate:true});
+  setTimeout(()=>{
+    const offsetPx=window.innerHeight*0.25;
+    const pt=map.latLngToContainerPoint([S.gpsPos.lat,S.gpsPos.lng]);
+    const newCenter=map.containerPointToLatLng([pt.x,pt.y-offsetPx]);
+    map.setView(newCenter,zoom,{animate:false});
+  },350);
+}
 
 // ═══ HEADING-UP MAP ROTATION ═══
 S.headingUp = false;
@@ -956,22 +1189,20 @@ function setupDrag(){
 }
 
 function onMapTap(e){
-  // Only fire for golf and hunt modes, not photo
-  if(S.mode==='photo') return;
+  // Only fire for golf and hunt tabs — not photo
+  if(S.activeTab!=='map'&&S.activeTab!=='hunt') return;
   if(!S.gpsPos) return;
   if(S.dragging) return;
-  // Calculate distance from GPS position to tapped point
   const tapLat = e.latlng.lat;
   const tapLng = e.latlng.lng;
   const yards = Math.round(haversineYards(S.gpsPos.lat, S.gpsPos.lng, tapLat, tapLng));
   if(yards < 2) return;
   S.dragVal = yards;
   S.lastDragPt = map.latLngToContainerPoint(e.latlng);
-  // Draw brief tracer line from GPS to tap point then drop pin
   const from = map.latLngToContainerPoint([S.gpsPos.lat, S.gpsPos.lng]);
   const to = S.lastDragPt;
   SVG.innerHTML='';
-  const col = S.mode==='golf'?'rgba(134,239,172,0.8)':'rgba(217,119,6,0.8)';
+  const col = S.activeTab==='map'?'rgba(134,239,172,0.8)':'rgba(217,119,6,0.8)';
   const ln=document.createElementNS('http://www.w3.org/2000/svg','line');
   ln.setAttribute('x1',from.x);ln.setAttribute('y1',from.y);
   ln.setAttribute('x2',to.x);ln.setAttribute('y2',to.y);
@@ -981,7 +1212,6 @@ function onMapTap(e){
   dot.setAttribute('cx',to.x);dot.setAttribute('cy',to.y);dot.setAttribute('r','7');
   dot.setAttribute('fill',col);dot.setAttribute('stroke','white');dot.setAttribute('stroke-width','2');
   SVG.appendChild(dot);
-  // Yardage label on line
   const mx=(from.x+to.x)/2,my=(from.y+to.y)/2;
   const label=yards+'y';const lw=label.length*11+12;
   const bg=document.createElementNS('http://www.w3.org/2000/svg','rect');
@@ -992,9 +1222,8 @@ function onMapTap(e){
   const txt=document.createElementNS('http://www.w3.org/2000/svg','text');
   txt.setAttribute('x',mx);txt.setAttribute('y',my+4);txt.setAttribute('text-anchor','middle');
   txt.setAttribute('font-family','Cinzel,serif');txt.setAttribute('font-size','13');
-  txt.setAttribute('fill',S.mode==='golf'?'#86efac':'#d97706');txt.setAttribute('letter-spacing','1');
+  txt.setAttribute('fill',S.activeTab==='map'?'#86efac':'#d97706');txt.setAttribute('letter-spacing','1');
   txt.textContent=label;SVG.appendChild(txt);
-  // Drop pin then clear tracer
   dropPin();
   setTimeout(()=>{SVG.innerHTML='';},800);
   if(navigator.vibrate) navigator.vibrate([40,20,40]);
@@ -1109,7 +1338,9 @@ function dropPin(){
   const label=S.mode==='golf'?S.dragVal+'y':S.dragVal+'yd';
   marker.bindTooltip(label,{permanent:true,className:'yrd-tip',direction:'right',offset:[10,-22]});
   S.droppedPins.push({marker,val:S.dragVal,num:S.droppedPins.length+1,mode:S.mode});
+  // Always show clear button when pins exist on any map tab
   document.getElementById('clear-pins-btn').classList.add('show');
+  document.getElementById('clear-pins-btn').style.display='block';
   updatePinLegend();
   if(navigator.vibrate)navigator.vibrate([60,30,60]);
 }
@@ -1426,8 +1657,10 @@ function switchTab(tab){
   document.getElementById('top-hud').style.display=tab==='map'?'flex':'none';
   document.getElementById('photo-hud').classList.toggle('active',tab==='photo-map');
   document.getElementById('map-controls').style.display=(tab==='map'||tab==='photo-map')?'flex':'none';
-  document.getElementById('clear-pins-btn').style.display=(tab==='map'||tab==='photo-map')&&S.droppedPins.length?'block':'none';
-  document.getElementById('pin-legend').style.display=(tab==='map'||tab==='photo-map')?'flex':'none';
+  // Show clear pins if there are pins AND we're on any map tab
+  const onMap=tab==='map'||tab==='photo-map';
+  document.getElementById('clear-pins-btn').style.display=onMap&&S.droppedPins.length?'block':'none';
+  document.getElementById('pin-legend').style.display=onMap?'flex':'none';
   // Tab highlight
   document.getElementById('tab-map').classList.toggle('active',tab==='map');
   document.getElementById('tab-photo').classList.toggle('active',tab==='photo-map');
@@ -1452,6 +1685,7 @@ function showToast(msg,type='golf',dur=2200){
 
 window.addEventListener('resize',()=>{if(map)setTimeout(()=>map.invalidateSize(),200);});
 window.addEventListener('orientationchange',()=>{if(map)setTimeout(()=>map.invalidateSize(),400);});
+window.addEventListener('DOMContentLoaded',()=>checkBeta());
 </script>
 </body>
 </html>
