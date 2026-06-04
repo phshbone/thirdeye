@@ -26,7 +26,7 @@
 html,body{width:100%;height:100%;overflow:hidden;font-family:'Raleway',sans-serif;background:#060606;touch-action:none;}
 
 /* ── SPLASH ── */
-#splash{position:fixed;inset:0;z-index:9000;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow:hidden;padding-bottom:15vh;}
+#splash{position:fixed;inset:0;z-index:9000;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow:hidden;padding-top:8vh;padding-bottom:8vh;}
 .splash-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,#0f1f0f 0%,#060606 70%);}
 .splash-bg::after{content:'';position:absolute;inset:0;background:var(--carbon);}
 /* Subtle grid lines */
@@ -108,7 +108,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Raleway',sans-seri
 #shot-svg{position:fixed;inset:0;bottom:68px;width:100%;height:calc(100% - 68px);pointer-events:none;z-index:1000;}
 
 /* ── TOP HUD — glassmorphism panels ── */
-#top-hud{position:fixed;top:max(14px,env(safe-area-inset-top,14px));left:12px;right:12px;z-index:400;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
+#top-hud{position:fixed;top:max(14px,env(safe-area-inset-top,14px));left:12px;right:12px;z-index:400;display:flex;flex-direction:column;gap:8px;pointer-events:none;transition:opacity 0.3s ease;}
 #course-badge{
   background:rgba(6,14,6,0.82);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   border:1px solid rgba(134,239,172,0.12);border-radius:16px;
@@ -142,7 +142,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Raleway',sans-seri
 .wind-relation{font-family:'Oswald',sans-serif;font-size:9px;letter-spacing:1.5px;padding:3px 8px;border-radius:20px;background:rgba(134,239,172,0.06);color:var(--accent);border:1px solid rgba(134,239,172,0.12);}
 
 /* ── PHOTO HUD ── */
-#photo-hud{position:fixed;top:max(14px,env(safe-area-inset-top,14px));left:12px;right:12px;z-index:400;display:none;flex-direction:column;gap:8px;pointer-events:none;}
+#photo-hud{position:fixed;top:max(14px,env(safe-area-inset-top,14px));left:12px;right:12px;z-index:400;display:none;flex-direction:column;gap:8px;pointer-events:none;transition:opacity 0.3s ease;}
 #photo-hud.active{display:flex;}
 #location-badge{
   background:rgba(6,6,16,0.82);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
@@ -326,7 +326,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Raleway',sans-seri
 <!-- ═══ SPLASH ═══ -->
 <div id="splash">
   <div class="splash-bg"></div>
-  <div class="splash-logo" style="margin-top:max(60px,env(safe-area-inset-top,60px));">
+  <div class="splash-logo">
     <span class="word-third">Third</span>
     <span class="word-eye">Eye</span>
   </div>
@@ -773,7 +773,20 @@ function startWatch(){
 function onGPS(lat,lng){
   const first=!S.gpsPos;
   S.gpsPos={lat,lng};
-  if(first||!S.userPanned)map.setView([lat,lng],first?18:map.getZoom(),{animate:!first});
+  if(first||!S.userPanned){
+    // Offset map so GPS position sits at 75% down the screen — bottom quarter
+    // Gives full upper screen for dragging toward target
+    const zoom = first ? 18 : map.getZoom();
+    const offsetPx = window.innerHeight * 0.25; // shift center up by 25% of screen
+    map.setView([lat,lng], zoom, {animate:!first});
+    if(first){
+      setTimeout(()=>{
+        const pt = map.latLngToContainerPoint([lat,lng]);
+        const newCenter = map.containerPointToLatLng([pt.x, pt.y - offsetPx]);
+        map.setView(newCenter, zoom, {animate:false});
+      }, 100);
+    }
+  }
   drawGPSMarker();
 }
 function recenter(){S.userPanned=false;if(S.gpsPos)map.setView([S.gpsPos.lat,S.gpsPos.lng],map.getZoom(),{animate:true});}
@@ -823,20 +836,17 @@ function requestCompassPermission(){
 function startCompass(){
   S.compassListener = function(e){
     if(!S.headingUp) return;
-    // webkitCompassHeading on iOS, alpha on Android (need to invert)
     let heading = e.webkitCompassHeading != null
       ? e.webkitCompassHeading
       : (360 - (e.alpha || 0));
     S.currentHeading = heading;
     const mapEl = document.getElementById('map');
     const svgEl = document.getElementById('shot-svg');
-    // Rotate map container opposite to heading so "forward" faces up
-    mapEl.style.transform = `rotate(${-heading}deg)`;
+    // Scale 1.5 fills corners during rotation — no black triangles
+    mapEl.style.transform = `rotate(${-heading}deg) scale(1.5)`;
     mapEl.style.transformOrigin = 'center center';
-    // Counter-rotate SVG so tracer lines stay screen-oriented
-    svgEl.style.transform = `rotate(${-heading}deg)`;
+    svgEl.style.transform = `rotate(${-heading}deg) scale(1.5)`;
     svgEl.style.transformOrigin = 'center center';
-    // Also counter-rotate markers by updating GPS marker
     if(gpsMarker) drawGPSMarker();
   };
   window.addEventListener('deviceorientation', S.compassListener, true);
@@ -930,7 +940,7 @@ function makeLensDropIcon(num){
   return L.divIcon({className:'',html:svg,iconSize:[32,58],iconAnchor:[16,56],popupAnchor:[0,-58]});
 }
 
-// ═══ DRAG TO MEASURE ═══
+// ═══ DRAG TO MEASURE (Photo) + TAP TO PLACE (Golf & Hunt) ═══
 function setupDrag(){
   const el=document.getElementById('map');
   el.addEventListener('touchstart',onDS,{passive:false});
@@ -939,6 +949,59 @@ function setupDrag(){
   el.addEventListener('mousedown',onDS);
   window.addEventListener('mousemove',onDM);
   window.addEventListener('mouseup',onDE);
+  // Tap-to-place for Golf and Hunt
+  map.on('click', onMapTap);
+}
+
+function onMapTap(e){
+  // Only fire for golf and hunt modes, not photo
+  if(S.mode==='photo') return;
+  if(!S.gpsPos) return;
+  if(S.dragging) return;
+  // Calculate distance from GPS position to tapped point
+  const tapLat = e.latlng.lat;
+  const tapLng = e.latlng.lng;
+  const yards = Math.round(haversineYards(S.gpsPos.lat, S.gpsPos.lng, tapLat, tapLng));
+  if(yards < 2) return;
+  S.dragVal = yards;
+  S.lastDragPt = map.latLngToContainerPoint(e.latlng);
+  // Draw brief tracer line from GPS to tap point then drop pin
+  const from = map.latLngToContainerPoint([S.gpsPos.lat, S.gpsPos.lng]);
+  const to = S.lastDragPt;
+  SVG.innerHTML='';
+  const col = S.mode==='golf'?'rgba(134,239,172,0.8)':'rgba(217,119,6,0.8)';
+  const ln=document.createElementNS('http://www.w3.org/2000/svg','line');
+  ln.setAttribute('x1',from.x);ln.setAttribute('y1',from.y);
+  ln.setAttribute('x2',to.x);ln.setAttribute('y2',to.y);
+  ln.setAttribute('stroke',col);ln.setAttribute('stroke-width','2');
+  ln.setAttribute('stroke-dasharray','8 5');SVG.appendChild(ln);
+  const dot=document.createElementNS('http://www.w3.org/2000/svg','circle');
+  dot.setAttribute('cx',to.x);dot.setAttribute('cy',to.y);dot.setAttribute('r','7');
+  dot.setAttribute('fill',col);dot.setAttribute('stroke','white');dot.setAttribute('stroke-width','2');
+  SVG.appendChild(dot);
+  // Yardage label on line
+  const mx=(from.x+to.x)/2,my=(from.y+to.y)/2;
+  const label=yards+'y';const lw=label.length*11+12;
+  const bg=document.createElementNS('http://www.w3.org/2000/svg','rect');
+  bg.setAttribute('x',mx-lw/2);bg.setAttribute('y',my-13);
+  bg.setAttribute('width',lw);bg.setAttribute('height',22);bg.setAttribute('rx','5');
+  bg.setAttribute('fill','rgba(5,5,15,0.88)');bg.setAttribute('stroke',col);bg.setAttribute('stroke-width','1');
+  SVG.appendChild(bg);
+  const txt=document.createElementNS('http://www.w3.org/2000/svg','text');
+  txt.setAttribute('x',mx);txt.setAttribute('y',my+4);txt.setAttribute('text-anchor','middle');
+  txt.setAttribute('font-family','Cinzel,serif');txt.setAttribute('font-size','13');
+  txt.setAttribute('fill',S.mode==='golf'?'#86efac':'#d97706');txt.setAttribute('letter-spacing','1');
+  txt.textContent=label;SVG.appendChild(txt);
+  // Drop pin then clear tracer
+  dropPin();
+  setTimeout(()=>{SVG.innerHTML='';},800);
+  if(navigator.vibrate) navigator.vibrate([40,20,40]);
+}
+
+function haversineYards(lat1,lon1,lat2,lon2){
+  const R=6371000,dLat=(lat2-lat1)*Math.PI/180,dLon=(lon2-lon1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))*1.09361;
 }
 function getXY(e){
   const t=e.touches?e.touches[0]:e;
@@ -954,6 +1017,11 @@ function onDS(e){
   map.dragging.disable();
   map.touchZoom.disable();
   drawGPSMarker(true);
+  // Hide HUD while dragging so map is fully visible
+  document.getElementById('top-hud').style.opacity='0';
+  document.getElementById('top-hud').style.pointerEvents='none';
+  document.getElementById('photo-hud').style.opacity='0';
+  document.getElementById('photo-hud').style.pointerEvents='none';
   e.preventDefault();
   e.stopPropagation();
 }
@@ -1021,6 +1089,11 @@ function onDE(){
   map.touchZoom.enable();
   drawGPSMarker(false);
   document.getElementById('measure-readout').classList.remove('show');
+  // Fade HUD back in
+  document.getElementById('top-hud').style.opacity='1';
+  document.getElementById('top-hud').style.pointerEvents='';
+  document.getElementById('photo-hud').style.opacity='1';
+  document.getElementById('photo-hud').style.pointerEvents='';
   if(S.dragVal>2&&S.gpsPos&&S.lastDragPt) dropPin();
   setTimeout(()=>{SVG.innerHTML='';},500);
 }
