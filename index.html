@@ -196,15 +196,15 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Raleway',sans-seri
 .map-ctrl-btn:active{background:rgba(255,255,255,0.08);}
 
 #clear-pins-btn{
-  position:fixed;left:12px;bottom:calc(68px + 14px);z-index:400;
+  position:fixed;left:12px;bottom:calc(68px + 90px);z-index:400;
   background:rgba(4,4,6,0.85);backdrop-filter:blur(14px);
-  border:1px solid rgba(239,68,68,0.25);border-radius:10px;
-  color:rgba(239,68,68,0.7);font-family:'Oswald',sans-serif;
+  border:1px solid rgba(217,119,6,0.35);border-radius:10px;
+  color:rgba(217,119,6,0.85);font-family:'Oswald',sans-serif;
   font-size:10px;letter-spacing:2px;padding:8px 12px;cursor:pointer;display:none;
   transition:all .2s;
 }
 #clear-pins-btn.show{display:block;}
-#pin-legend{position:fixed;left:12px;bottom:calc(68px + 58px);z-index:400;display:flex;flex-direction:column;gap:4px;}
+#pin-legend{position:fixed;left:12px;bottom:calc(68px + 132px);z-index:400;display:flex;flex-direction:column;gap:4px;}
 .pin-legend-item{
   background:rgba(4,4,6,0.85);backdrop-filter:blur(12px);
   border:1px solid rgba(255,255,255,0.06);border-radius:8px;
@@ -923,21 +923,23 @@ function makeGolfFlagIcon(num){
 function makeLensDropIcon(num){
   const cols=['#60a5fa','#f59e0b','#a78bfa','#34d399','#ef4444'];
   const c=cols[(num-1)%cols.length];
-  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="32" height="58" viewBox="0 0 32 58">
-    <ellipse cx="16" cy="56" rx="4" ry="1.5" fill="rgba(0,0,0,0.35)"/>
-    <line x1="16" y1="28" x2="16" y2="56" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round"/>
-    <rect x="11.5" y="22" width="9" height="7" rx="1.5" fill="#1e293b" stroke="#475569" stroke-width="0.8"/>
-    <path d="M5,22 Q5,5 16,3 Q27,5 27,22 Q23,18 20,17 L12,17 Q9,18 5,22Z" fill="#0f172a" stroke="${c}" stroke-width="1.2"/>
-    <circle cx="16" cy="11" r="7.5" fill="${c}" opacity="0.15"/>
-    <circle cx="16" cy="11" r="6" fill="none" stroke="${c}" stroke-width="1" opacity="0.8"/>
-    <circle cx="16" cy="11" r="4" fill="none" stroke="${c}" stroke-width="0.8" opacity="0.6"/>
-    <circle cx="16" cy="11" r="2" fill="none" stroke="${c}" stroke-width="0.7" opacity="0.5"/>
-    <circle cx="16" cy="11" r="1" fill="${c}" opacity="1"/>
-    <text x="16" y="14.5" text-anchor="middle" font-size="6" fill="white" font-family="Arial" font-weight="900" opacity="0.9">${num}</text>
-    <ellipse cx="13" cy="8" rx="1.5" ry="1" fill="rgba(255,255,255,0.2)" transform="rotate(-15,13,8)"/>
-    <circle cx="16" cy="56" r="3.5" fill="${c}" stroke="white" stroke-width="1.5"/>
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="32" height="64" viewBox="0 0 32 64">
+    <ellipse cx="16" cy="62" rx="4" ry="1.5" fill="rgba(0,0,0,0.35)"/>
+    <line x1="16" y1="36" x2="16" y2="62" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round"/>
+    <rect x="11.5" y="29" width="9" height="8" rx="1.5" fill="#1e293b" stroke="#475569" stroke-width="0.8"/>
+    <!-- Hood flares UPWARD — petal shape at top -->
+    <path d="M5,29 Q5,12 16,10 Q27,12 27,29 Q23,25 20,24 L12,24 Q9,25 5,29Z" fill="#0f172a" stroke="${c}" stroke-width="1.2"/>
+    <!-- Aperture rings inside hood -->
+    <circle cx="16" cy="18" r="7.5" fill="${c}" opacity="0.12"/>
+    <circle cx="16" cy="18" r="6" fill="none" stroke="${c}" stroke-width="1" opacity="0.8"/>
+    <circle cx="16" cy="18" r="4" fill="none" stroke="${c}" stroke-width="0.8" opacity="0.6"/>
+    <circle cx="16" cy="18" r="2.2" fill="none" stroke="${c}" stroke-width="0.7" opacity="0.5"/>
+    <circle cx="16" cy="18" r="1" fill="${c}" opacity="1"/>
+    <text x="16" y="21.5" text-anchor="middle" font-size="5.5" fill="white" font-family="Arial" font-weight="900" opacity="0.9">${num}</text>
+    <ellipse cx="12.5" cy="14" rx="2" ry="1.2" fill="rgba(255,255,255,0.22)" transform="rotate(-15,12.5,14)"/>
+    <circle cx="16" cy="62" r="3.5" fill="${c}" stroke="white" stroke-width="1.5"/>
   </svg>`;
-  return L.divIcon({className:'',html:svg,iconSize:[32,58],iconAnchor:[16,56],popupAnchor:[0,-58]});
+  return L.divIcon({className:'',html:svg,iconSize:[32,64],iconAnchor:[16,62],popupAnchor:[0,-64]});
 }
 
 // ═══ DRAG TO MEASURE (Photo) + TAP TO PLACE (Golf & Hunt) ═══
@@ -1127,9 +1129,9 @@ function updatePinLegend(){
   });
 }
 
-// Tooltip style
+// Tooltip style — transform:none prevents mirroring when map rotates
 const ts=document.createElement('style');
-ts.textContent=`.yrd-tip{background:rgba(5,5,15,0.92)!important;border:1px solid rgba(255,255,255,0.15)!important;color:#e2e8f0!important;font-family:'Bebas Neue',sans-serif!important;font-size:13px!important;letter-spacing:1px!important;border-radius:6px!important;padding:3px 8px!important;box-shadow:0 2px 8px rgba(0,0,0,0.5)!important;}.yrd-tip::before{display:none!important;}`;
+ts.textContent=`.yrd-tip{background:rgba(5,5,15,0.92)!important;border:1px solid rgba(255,255,255,0.15)!important;color:#e2e8f0!important;font-family:'Cinzel',serif!important;font-size:13px!important;letter-spacing:1px!important;border-radius:6px!important;padding:3px 8px!important;box-shadow:0 2px 8px rgba(0,0,0,0.5)!important;transform:none!important;direction:ltr!important;unicode-bidi:normal!important;}.yrd-tip::before{display:none!important;}.leaflet-tooltip{transform:none!important;}`;
 document.head.appendChild(ts);
 
 // ═══ CONVERSIONS ═══
