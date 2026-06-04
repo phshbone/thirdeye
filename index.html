@@ -68,7 +68,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Nunito',sans-serif
 
 /* ── MAP ── */
 #map{width:100%;height:100%;}
-#shot-svg{position:fixed;inset:0;bottom:64px;width:100%;pointer-events:none;z-index:300;}
+#shot-svg{position:fixed;inset:0;bottom:64px;width:100%;height:calc(100% - 64px);pointer-events:none;z-index:1000;}
 
 /* ── TOP HUD ── */
 #top-hud{position:fixed;top:max(12px,env(safe-area-inset-top,12px));left:12px;right:12px;z-index:400;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
@@ -605,15 +605,37 @@ function onDM(e){
     const isPhoto=S.mode==='photo';
     const tc=isPhoto?'rgba(96,165,250,0.75)':'rgba(134,239,172,0.75)';
     const dc=isPhoto?'rgba(96,165,250,0.9)':'rgba(134,239,172,0.9)';
+    const lc=isPhoto?'#60a5fa':'#86efac';
+    // Dotted tracer line
     const ln=document.createElementNS('http://www.w3.org/2000/svg','line');
     ln.setAttribute('x1',S.dragStart.x);ln.setAttribute('y1',S.dragStart.y);
     ln.setAttribute('x2',x);ln.setAttribute('y2',y);
-    ln.setAttribute('stroke',tc);ln.setAttribute('stroke-width','2');
-    ln.setAttribute('stroke-dasharray','6 4');SVG.appendChild(ln);
+    ln.setAttribute('stroke',tc);ln.setAttribute('stroke-width','2.5');
+    ln.setAttribute('stroke-dasharray','8 5');SVG.appendChild(ln);
+    // Endpoint circle
     const dot=document.createElementNS('http://www.w3.org/2000/svg','circle');
-    dot.setAttribute('cx',x);dot.setAttribute('cy',y);dot.setAttribute('r','6');
-    dot.setAttribute('fill',dc);dot.setAttribute('stroke','white');dot.setAttribute('stroke-width','1.5');
+    dot.setAttribute('cx',x);dot.setAttribute('cy',y);dot.setAttribute('r','7');
+    dot.setAttribute('fill',dc);dot.setAttribute('stroke','white');dot.setAttribute('stroke-width','2');
     SVG.appendChild(dot);
+    // Mid-line yardage label — sits ON the line like E-Zone
+    const mx=(S.dragStart.x+x)/2, my=(S.dragStart.y+y)/2;
+    const angle=Math.atan2(y-S.dragStart.y,x-S.dragStart.x)*180/Math.PI;
+    const bg=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    const label=yards+'y';
+    const lw=label.length*11+12;
+    bg.setAttribute('x',mx-lw/2);bg.setAttribute('y',my-13);
+    bg.setAttribute('width',lw);bg.setAttribute('height',22);
+    bg.setAttribute('rx','5');bg.setAttribute('fill','rgba(5,5,15,0.85)');
+    bg.setAttribute('stroke',tc);bg.setAttribute('stroke-width','1');
+    SVG.appendChild(bg);
+    const txt=document.createElementNS('http://www.w3.org/2000/svg','text');
+    txt.setAttribute('x',mx);txt.setAttribute('y',my+4);
+    txt.setAttribute('text-anchor','middle');
+    txt.setAttribute('font-family','Bebas Neue,sans-serif');
+    txt.setAttribute('font-size','14');txt.setAttribute('fill',lc);
+    txt.setAttribute('letter-spacing','1');
+    txt.textContent=label;
+    SVG.appendChild(txt);
   }
   const shotAngle=Math.atan2(dy,dx)*180/Math.PI;
   updateWindRelation(shotAngle);
