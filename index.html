@@ -583,12 +583,16 @@ function onDS(e){
   if(!S.gpsPos||(S.activeTab!=='map'&&S.activeTab!=='photo-map'))return;
   const{x,y}=getXY(e);
   const c=map.latLngToContainerPoint([S.gpsPos.lat,S.gpsPos.lng]);
-  if(Math.hypot(x-c.x,y-c.y)>50)return;
+  if(Math.hypot(x-c.x,y-c.y)>44)return;
   S.dragging=true;S.dragStart={x:c.x,y:c.y};
-  drawGPSMarker(true);e.preventDefault();
+  map.dragging.disable();
+  map.touchZoom.disable();
+  drawGPSMarker(true);
+  e.preventDefault();
+  e.stopPropagation();
 }
 function onDM(e){
-  if(!S.dragging)return;e.preventDefault();
+  if(!S.dragging)return;e.preventDefault();e.stopPropagation();
   const{x,y}=getXY(e);
   S.lastDragPt={x,y};
   const dx=x-S.dragStart.x,dy=y-S.dragStart.y;
@@ -623,7 +627,10 @@ function onDM(e){
 }
 function onDE(){
   if(!S.dragging)return;
-  S.dragging=false;drawGPSMarker(false);
+  S.dragging=false;
+  map.dragging.enable();
+  map.touchZoom.enable();
+  drawGPSMarker(false);
   document.getElementById('measure-readout').classList.remove('show');
   if(S.dragVal>2&&S.gpsPos&&S.lastDragPt) dropPin();
   setTimeout(()=>{SVG.innerHTML='';},500);
