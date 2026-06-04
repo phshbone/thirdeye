@@ -26,7 +26,7 @@
 html,body{width:100%;height:100%;overflow:hidden;font-family:'Raleway',sans-serif;background:#060606;touch-action:none;}
 
 /* ── SPLASH ── */
-#splash{position:fixed;inset:0;z-index:9000;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;}
+#splash{position:fixed;inset:0;z-index:9000;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow:hidden;padding-bottom:15vh;}
 .splash-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,#0f1f0f 0%,#060606 70%);}
 .splash-bg::after{content:'';position:absolute;inset:0;background:var(--carbon);}
 /* Subtle grid lines */
@@ -59,16 +59,17 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Raleway',sans-seri
 #tab-bar{
   position:fixed;bottom:0;left:0;right:0;
   height:max(68px,calc(58px + env(safe-area-inset-bottom,10px)));
-  background:rgba(4,4,6,0.97);
+  background:rgba(6,6,10,0.98);
   backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-  border-top:1px solid rgba(255,255,255,0.06);
+  border-top:1px solid rgba(255,255,255,0.12);
+  box-shadow:0 -1px 0 rgba(0,0,0,0.8), 0 -4px 20px rgba(0,0,0,0.5);
   display:flex;z-index:500;
   padding-bottom:env(safe-area-inset-bottom,0px);
 }
 .tab-btn{
   flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:4px;border:none;background:none;
-  color:rgba(255,255,255,0.2);
+  color:rgba(255,255,255,0.35);
   font-family:'Oswald',sans-serif;font-size:9px;letter-spacing:2px;
   cursor:pointer;transition:all .2s;padding-top:6px;
   position:relative;
@@ -306,6 +307,18 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Raleway',sans-seri
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
 @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+@keyframes wordPulse{0%,100%{opacity:0.18;filter:none;}40%,60%{opacity:1;filter:drop-shadow(0 0 8px currentColor);}}
+@keyframes iconFloat{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-6px) scale(1.02);}}
+@keyframes pearlGlow{0%,100%{filter:drop-shadow(0 0 6px rgba(134,239,172,0.3)) drop-shadow(0 0 2px rgba(255,255,255,0.4));}50%{filter:drop-shadow(0 0 16px rgba(134,239,172,0.5)) drop-shadow(0 0 6px rgba(255,255,255,0.6));}}
+@keyframes lensGlow{0%,100%{filter:drop-shadow(0 0 6px rgba(96,165,250,0.3));}50%{filter:drop-shadow(0 0 18px rgba(96,165,250,0.6)) drop-shadow(0 0 6px rgba(129,140,248,0.4));}}
+@keyframes antlerGlow{0%,100%{filter:drop-shadow(0 0 4px rgba(217,119,6,0.3));}50%{filter:drop-shadow(0 0 14px rgba(217,119,6,0.55)) drop-shadow(0 0 4px rgba(251,191,36,0.35));}}
+.splash-word{display:inline-block;font-family:'Raleway',sans-serif;font-size:10px;font-weight:400;letter-spacing:8px;text-transform:uppercase;color:rgba(255,255,255,0.18);animation:wordPulse 3s ease-in-out infinite;}
+.splash-word-measure{animation-delay:0s;}
+.splash-word-mark{animation-delay:1s;}
+.splash-word-shoot{animation-delay:2s;}
+.splash-icon-golf{animation:iconFloat 4s ease-in-out infinite, pearlGlow 4s ease-in-out infinite;}
+.splash-icon-photo{animation:iconFloat 4s 0.8s ease-in-out infinite, lensGlow 4s 0.8s ease-in-out infinite;}
+.splash-icon-hunt{animation:iconFloat 4s 1.6s ease-in-out infinite, antlerGlow 4s 1.6s ease-in-out infinite;}
 </style>
 </head>
 <body>
@@ -313,79 +326,170 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Raleway',sans-seri
 <!-- ═══ SPLASH ═══ -->
 <div id="splash">
   <div class="splash-bg"></div>
-  <div class="splash-modes">
-    <div class="splash-mode-pill g">⛳ GOLF</div>
-    <div class="splash-mode-pill h">🦌 HUNT</div>
-    <div class="splash-mode-pill p">📷 PHOTO</div>
-  </div>
-  <div class="splash-logo">
+  <div class="splash-logo" style="margin-top:max(60px,env(safe-area-inset-top,60px));">
     <span class="word-third">Third</span>
     <span class="word-eye">Eye</span>
   </div>
-  <div class="splash-sub">Measure &nbsp;·&nbsp; Mark &nbsp;·&nbsp; Shoot</div>
+  <!-- Sequential animated tagline -->
+  <div style="display:flex;gap:14px;align-items:center;margin-bottom:40px;position:relative;z-index:1;animation:fadeUp .8s .25s ease both;">
+    <span class="splash-word splash-word-measure" style="color:var(--accent);">Measure</span>
+    <span style="color:rgba(255,255,255,0.06);font-size:8px;letter-spacing:0;">·</span>
+    <span class="splash-word splash-word-mark" style="color:var(--photo-accent);">Mark</span>
+    <span style="color:rgba(255,255,255,0.06);font-size:8px;letter-spacing:0;">·</span>
+    <span class="splash-word splash-word-shoot" style="color:var(--hunt-accent);">Shoot</span>
+  </div>
+  <!-- Surreal icons -->
   <div class="splash-icons">
-    <!-- Golf ball on tee — clean minimal -->
+    <!-- ── GOLF BALL — hyper-realistic pearl ── -->
     <div class="splash-icon-wrap">
-      <svg width="44" height="58" viewBox="0 0 44 58" fill="none">
-        <ellipse cx="22" cy="56" rx="8" ry="2" fill="rgba(255,255,255,0.08)"/>
-        <rect x="20.5" y="38" width="3" height="14" rx="1.5" fill="#d97706"/>
-        <rect x="13" y="51" width="18" height="3.5" rx="1.75" fill="#92400e"/>
-        <circle cx="22" cy="22" r="16" fill="white" opacity="0.92"/>
-        <circle cx="22" cy="22" r="16" fill="url(#gb)"/>
-        <defs><radialGradient id="gb" cx="35%" cy="28%"><stop offset="0%" stop-color="white"/><stop offset="55%" stop-color="#d1d5db"/><stop offset="100%" stop-color="#9ca3af"/></radialGradient></defs>
-        <circle cx="14" cy="17" r="2" fill="rgba(0,0,0,0.1)"/>
-        <circle cx="22" cy="14" r="2" fill="rgba(0,0,0,0.1)"/>
-        <circle cx="30" cy="17" r="2" fill="rgba(0,0,0,0.1)"/>
-        <circle cx="17" cy="24" r="2" fill="rgba(0,0,0,0.1)"/>
-        <circle cx="27" cy="24" r="2" fill="rgba(0,0,0,0.1)"/>
-        <circle cx="14" cy="31" r="2" fill="rgba(0,0,0,0.1)"/>
-        <circle cx="30" cy="31" r="2" fill="rgba(0,0,0,0.1)"/>
+      <svg class="splash-icon-golf" width="72" height="90" viewBox="0 0 72 90" fill="none">
+        <defs>
+          <radialGradient id="ballGrad" cx="32%" cy="28%" r="65%">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="30%" stop-color="#f8fafc"/>
+            <stop offset="65%" stop-color="#cbd5e1"/>
+            <stop offset="100%" stop-color="#94a3b8"/>
+          </radialGradient>
+          <radialGradient id="ballInner" cx="70%" cy="70%" r="60%">
+            <stop offset="0%" stop-color="rgba(134,239,172,0.14)"/>
+            <stop offset="100%" stop-color="transparent"/>
+          </radialGradient>
+          <linearGradient id="teeShaft" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#d97706"/>
+            <stop offset="50%" stop-color="#fbbf24"/>
+            <stop offset="100%" stop-color="#92400e"/>
+          </linearGradient>
+          <linearGradient id="teeCup" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#d97706"/>
+            <stop offset="100%" stop-color="#78350f"/>
+          </linearGradient>
+        </defs>
+        <ellipse cx="36" cy="88" rx="12" ry="3" fill="rgba(0,0,0,0.3)"/>
+        <path d="M34.5 62 L34.5 78 Q36 80 37.5 78 L37.5 62Z" fill="url(#teeShaft)"/>
+        <path d="M28 76 Q36 82 44 76 L42 78 Q36 84 30 78Z" fill="url(#teeCup)"/>
+        <circle cx="36" cy="34" r="28" fill="url(#ballGrad)"/>
+        <circle cx="36" cy="34" r="28" fill="url(#ballInner)"/>
+        <circle cx="24" cy="26" r="2.2" fill="rgba(80,100,120,0.18)"/>
+        <circle cx="33" cy="22" r="2.2" fill="rgba(80,100,120,0.18)"/>
+        <circle cx="43" cy="24" r="2.2" fill="rgba(80,100,120,0.18)"/>
+        <circle cx="50" cy="30" r="2.2" fill="rgba(80,100,120,0.18)"/>
+        <circle cx="20" cy="34" r="2.2" fill="rgba(80,100,120,0.18)"/>
+        <circle cx="28" cy="32" r="2.2" fill="rgba(80,100,120,0.18)"/>
+        <circle cx="38" cy="30" r="2.2" fill="rgba(80,100,120,0.18)"/>
+        <circle cx="47" cy="36" r="2.2" fill="rgba(80,100,120,0.18)"/>
+        <circle cx="22" cy="42" r="2.2" fill="rgba(80,100,120,0.18)"/>
+        <circle cx="32" cy="40" r="2.2" fill="rgba(80,100,120,0.18)"/>
+        <circle cx="42" cy="42" r="2.2" fill="rgba(80,100,120,0.18)"/>
+        <circle cx="50" cy="44" r="2.2" fill="rgba(80,100,120,0.18)"/>
+        <circle cx="26" cy="50" r="2.2" fill="rgba(80,100,120,0.18)"/>
+        <circle cx="36" cy="52" r="2.2" fill="rgba(80,100,120,0.18)"/>
+        <circle cx="46" cy="50" r="2.2" fill="rgba(80,100,120,0.18)"/>
+        <ellipse cx="27" cy="22" rx="7" ry="4.5" fill="rgba(255,255,255,0.55)" transform="rotate(-20,27,22)"/>
+        <ellipse cx="24" cy="20" rx="3" ry="2" fill="rgba(255,255,255,0.75)" transform="rotate(-20,24,20)"/>
+        <circle cx="36" cy="34" r="27.5" fill="none" stroke="rgba(134,239,172,0.07)" stroke-width="2"/>
       </svg>
       <span class="splash-icon-label" style="color:var(--accent);">Golf</span>
     </div>
-    <!-- Lens hood pin — upright, petal flare, aperture center -->
+    <!-- ── CAMERA LENS — 3/4 angle, body receding ── -->
     <div class="splash-icon-wrap">
-      <svg width="40" height="66" viewBox="0 0 40 66" fill="none">
-        <ellipse cx="20" cy="64" rx="5" ry="2" fill="rgba(255,255,255,0.06)"/>
-        <line x1="20" y1="34" x2="20" y2="64" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"/>
-        <rect x="14" y="27" width="12" height="9" rx="2.5" fill="#1e293b" stroke="#475569" stroke-width="1"/>
-        <!-- Petal flare hood -->
-        <path d="M6,27 Q4,8 20,2 Q36,8 34,27 Q30,21 26,19 L14,19 Q10,21 6,27Z" fill="#0f172a" stroke="#334155" stroke-width="1.2"/>
-        <!-- Inner petal detail -->
-        <path d="M8,25 Q6,10 20,5 Q34,10 32,25" fill="none" stroke="#1e3a5f" stroke-width="0.7" opacity="0.6"/>
-        <!-- Aperture glass rings -->
-        <circle cx="20" cy="13" r="9" fill="#60a5fa" opacity="0.08"/>
-        <circle cx="20" cy="13" r="7.5" fill="none" stroke="#60a5fa" stroke-width="1" opacity="0.7"/>
-        <circle cx="20" cy="13" r="5.5" fill="none" stroke="#7dd3fc" stroke-width="0.9" opacity="0.55"/>
-        <circle cx="20" cy="13" r="3.5" fill="none" stroke="#bae6fd" stroke-width="0.8" opacity="0.45"/>
-        <circle cx="20" cy="13" r="1.8" fill="none" stroke="#e0f2fe" stroke-width="0.7" opacity="0.35"/>
-        <circle cx="20" cy="13" r="1" fill="#f59e0b" opacity="0.95"/>
-        <ellipse cx="16.5" cy="9.5" rx="2.2" ry="1.4" fill="rgba(255,255,255,0.2)" transform="rotate(-15,16.5,9.5)"/>
+      <svg class="splash-icon-photo" width="72" height="90" viewBox="0 0 72 90" fill="none">
+        <defs>
+          <radialGradient id="glassGrad" cx="35%" cy="32%" r="60%">
+            <stop offset="0%" stop-color="rgba(96,165,250,0.45)"/>
+            <stop offset="50%" stop-color="rgba(129,140,248,0.25)"/>
+            <stop offset="100%" stop-color="rgba(15,30,60,0.9)"/>
+          </radialGradient>
+          <linearGradient id="bodyGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#1c1c1c"/>
+            <stop offset="100%" stop-color="#0a0a0a"/>
+          </linearGradient>
+          <linearGradient id="barrelGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#2a2a2a"/>
+            <stop offset="50%" stop-color="#1a1a1a"/>
+            <stop offset="100%" stop-color="#111"/>
+          </linearGradient>
+        </defs>
+        <path d="M42 28 L66 22 L68 68 L44 72Z" fill="url(#bodyGrad)" stroke="rgba(255,255,255,0.06)" stroke-width="0.8"/>
+        <path d="M18 20 L42 28 L66 22 L46 14Z" fill="#1a1a1a" stroke="rgba(255,255,255,0.05)" stroke-width="0.8"/>
+        <line x1="52" y1="24" x2="54" y2="68" stroke="rgba(255,255,255,0.05)" stroke-width="0.7"/>
+        <line x1="60" y1="22" x2="62" y2="66" stroke="rgba(255,255,255,0.04)" stroke-width="0.7"/>
+        <path d="M46 14 L60 10 L66 14 L66 22 L46 28Z" fill="#141414" stroke="rgba(255,255,255,0.05)" stroke-width="0.7"/>
+        <circle cx="28" cy="50" r="26" fill="url(#barrelGrad)" stroke="rgba(255,255,255,0.1)" stroke-width="1.2"/>
+        <circle cx="28" cy="50" r="22" fill="#141414" stroke="rgba(255,255,255,0.07)" stroke-width="0.8"/>
+        <circle cx="28" cy="50" r="18" fill="#0e0e0e" stroke="rgba(96,165,250,0.15)" stroke-width="0.8"/>
+        <circle cx="28" cy="50" r="14" fill="url(#glassGrad)"/>
+        <circle cx="28" cy="50" r="12" fill="none" stroke="rgba(96,165,250,0.35)" stroke-width="0.8"/>
+        <circle cx="28" cy="50" r="9" fill="none" stroke="rgba(129,140,248,0.3)" stroke-width="0.7"/>
+        <circle cx="28" cy="50" r="6" fill="none" stroke="rgba(147,197,253,0.25)" stroke-width="0.6"/>
+        <circle cx="28" cy="50" r="3" fill="none" stroke="rgba(186,230,253,0.2)" stroke-width="0.5"/>
+        <circle cx="28" cy="50" r="1.5" fill="rgba(245,158,11,0.9)"/>
+        <ellipse cx="22" cy="44" rx="5" ry="3.5" fill="rgba(255,255,255,0.18)" transform="rotate(-25,22,44)"/>
+        <ellipse cx="20" cy="43" rx="2" ry="1.5" fill="rgba(255,255,255,0.35)" transform="rotate(-25,20,43)"/>
+        <circle cx="28" cy="50" r="25.5" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="2"/>
+        <circle cx="28" cy="50" r="14" fill="none" stroke="rgba(96,165,250,0.1)" stroke-width="3"/>
       </svg>
       <span class="splash-icon-label" style="color:var(--photo-accent);">Photo</span>
     </div>
-    <!-- Antler rack — clean botanical -->
+    <!-- ── MOUNTED DEER HEAD — trophy, mystical ── -->
     <div class="splash-icon-wrap">
-      <svg width="44" height="58" viewBox="0 0 44 58" fill="none" opacity="0.75">
-        <ellipse cx="22" cy="56" rx="7" ry="2" fill="rgba(255,255,255,0.06)"/>
-        <line x1="22" y1="56" x2="22" y2="38" stroke="#a16207" stroke-width="2.2" stroke-linecap="round"/>
-        <!-- Left main beam -->
-        <path d="M22 38 L14 22 L10 8" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        <!-- Left tines -->
-        <path d="M14 22 L7 20" stroke="#d97706" stroke-width="1.6" stroke-linecap="round"/>
-        <path d="M12 28 L5 27" stroke="#d97706" stroke-width="1.4" stroke-linecap="round"/>
-        <path d="M11 33 L6 35" stroke="#d97706" stroke-width="1.2" stroke-linecap="round"/>
-        <!-- Right main beam -->
-        <path d="M22 38 L30 22 L34 8" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        <!-- Right tines -->
-        <path d="M30 22 L37 20" stroke="#d97706" stroke-width="1.6" stroke-linecap="round"/>
-        <path d="M32 28 L39 27" stroke="#d97706" stroke-width="1.4" stroke-linecap="round"/>
-        <path d="M33 33 L38 35" stroke="#d97706" stroke-width="1.2" stroke-linecap="round"/>
+      <svg class="splash-icon-hunt" width="72" height="90" viewBox="0 0 72 90" fill="none">
+        <defs>
+          <radialGradient id="headGrad" cx="50%" cy="40%" r="55%">
+            <stop offset="0%" stop-color="#92400e"/>
+            <stop offset="60%" stop-color="#6b3010"/>
+            <stop offset="100%" stop-color="#3d1a08"/>
+          </radialGradient>
+          <radialGradient id="eyeGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="rgba(251,191,36,0.95)"/>
+            <stop offset="60%" stop-color="rgba(217,119,6,0.4)"/>
+            <stop offset="100%" stop-color="transparent"/>
+          </radialGradient>
+          <linearGradient id="plaqueGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#1c0f04"/>
+            <stop offset="100%" stop-color="#0a0502"/>
+          </linearGradient>
+          <linearGradient id="antlerL" x1="0" y1="1" x2="0.3" y2="0">
+            <stop offset="0%" stop-color="#92400e"/>
+            <stop offset="100%" stop-color="#d97706"/>
+          </linearGradient>
+          <linearGradient id="antlerR" x1="1" y1="1" x2="0.7" y2="0">
+            <stop offset="0%" stop-color="#92400e"/>
+            <stop offset="100%" stop-color="#d97706"/>
+          </linearGradient>
+        </defs>
+        <path d="M20 72 Q36 78 52 72 L54 86 Q36 90 18 86Z" fill="url(#plaqueGrad)" stroke="rgba(217,119,6,0.15)" stroke-width="0.8"/>
+        <path d="M26 58 Q36 66 46 58 L48 72 Q36 78 24 72Z" fill="url(#headGrad)"/>
+        <ellipse cx="36" cy="48" rx="18" ry="16" fill="url(#headGrad)"/>
+        <path d="M18 42 Q12 34 16 28 Q20 34 22 40Z" fill="#7c3410"/>
+        <path d="M18 40 Q14 34 17 30 Q19 35 20 39Z" fill="#3d1a08" opacity="0.6"/>
+        <path d="M54 42 Q60 34 56 28 Q52 34 50 40Z" fill="#7c3410"/>
+        <path d="M54 40 Q58 34 55 30 Q53 35 52 39Z" fill="#3d1a08" opacity="0.6"/>
+        <ellipse cx="36" cy="56" rx="9" ry="6" fill="#6b2c0c"/>
+        <ellipse cx="36" cy="58" rx="7" ry="4" fill="#4a1e08"/>
+        <ellipse cx="33" cy="58" rx="1.8" ry="1.2" fill="#2a1004"/>
+        <ellipse cx="39" cy="58" rx="1.8" ry="1.2" fill="#2a1004"/>
+        <ellipse cx="28" cy="46" rx="4" ry="3.5" fill="#1a0a02"/>
+        <ellipse cx="44" cy="46" rx="4" ry="3.5" fill="#1a0a02"/>
+        <circle cx="28" cy="46" r="3" fill="url(#eyeGlow)"/>
+        <circle cx="44" cy="46" r="3" fill="url(#eyeGlow)"/>
+        <circle cx="28" cy="46" r="1.5" fill="rgba(251,191,36,0.95)"/>
+        <circle cx="44" cy="46" r="1.5" fill="rgba(251,191,36,0.95)"/>
+        <circle cx="26.5" cy="44.5" r="0.8" fill="rgba(255,255,255,0.6)"/>
+        <circle cx="42.5" cy="44.5" r="0.8" fill="rgba(255,255,255,0.6)"/>
+        <path d="M24 32 L18 18 L12 6" stroke="url(#antlerL)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M18 18 L10 16" stroke="url(#antlerL)" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M15 24 L7 22" stroke="url(#antlerL)" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M13 29 L6 30" stroke="url(#antlerL)" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M48 32 L54 18 L60 6" stroke="url(#antlerR)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M54 18 L62 16" stroke="url(#antlerR)" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M57 24 L65 22" stroke="url(#antlerR)" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M59 29 L66 30" stroke="url(#antlerR)" stroke-width="1.5" stroke-linecap="round"/>
+        <ellipse cx="36" cy="48" rx="18" ry="16" fill="none" stroke="rgba(217,119,6,0.18)" stroke-width="1.5"/>
       </svg>
       <span class="splash-icon-label" style="color:var(--hunt-accent);">Hunt</span>
     </div>
   </div>
-  <button class="splash-start" onclick="startApp()">LOCK ON ⊕</button>
+  <button class="splash-start" onclick="startApp()">Lock On ⊕</button>
 </div>
 
 <!-- ═══ MAIN APP ═══ -->
@@ -500,6 +604,13 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Raleway',sans-seri
     <button class="map-ctrl-btn" onclick="map&&map.zoomIn()">+</button>
     <button class="map-ctrl-btn" onclick="map&&map.zoomOut()">−</button>
     <button class="map-ctrl-btn" onclick="recenter()">⦿</button>
+    <button class="map-ctrl-btn" id="heading-btn" onclick="toggleHeadingUp()" title="Heading Up">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="9" r="7.5" stroke="currentColor" stroke-width="1.2" opacity="0.5"/>
+        <polygon points="9,2 11.5,8 9,6.5 6.5,8" fill="currentColor"/>
+        <circle cx="9" cy="9" r="1.5" fill="currentColor" opacity="0.5"/>
+      </svg>
+    </button>
   </div>
 
   <button id="clear-pins-btn" onclick="clearPins()">✕ CLEAR PINS</button>
@@ -666,6 +777,70 @@ function onGPS(lat,lng){
   drawGPSMarker();
 }
 function recenter(){S.userPanned=false;if(S.gpsPos)map.setView([S.gpsPos.lat,S.gpsPos.lng],map.getZoom(),{animate:true});}
+
+// ═══ HEADING-UP MAP ROTATION ═══
+S.headingUp = false;
+S.currentHeading = 0;
+
+function toggleHeadingUp(){
+  S.headingUp = !S.headingUp;
+  const btn = document.getElementById('heading-btn');
+  if(S.headingUp){
+    btn.style.color = 'var(--accent)';
+    btn.style.borderColor = 'rgba(134,239,172,0.4)';
+    showToast('Heading-Up ON','golf',1800);
+    requestCompassPermission();
+  } else {
+    btn.style.color = '';
+    btn.style.borderColor = '';
+    // Reset map rotation
+    document.getElementById('map').style.transform = 'rotate(0deg)';
+    document.getElementById('shot-svg').style.transform = 'rotate(0deg)';
+    showToast('North-Up','neutral',1500);
+    if(S.compassListener){
+      window.removeEventListener('deviceorientation', S.compassListener);
+      S.compassListener = null;
+    }
+  }
+}
+
+function requestCompassPermission(){
+  if(typeof DeviceOrientationEvent !== 'undefined' &&
+     typeof DeviceOrientationEvent.requestPermission === 'function'){
+    // iOS 13+ requires explicit permission
+    DeviceOrientationEvent.requestPermission()
+      .then(state => {
+        if(state === 'granted') startCompass();
+        else { showToast('Compass denied','neutral',2000); S.headingUp=false; }
+      })
+      .catch(()=>{ showToast('Compass unavailable','neutral',2000); S.headingUp=false; });
+  } else {
+    // Android / older iOS — no permission needed
+    startCompass();
+  }
+}
+
+function startCompass(){
+  S.compassListener = function(e){
+    if(!S.headingUp) return;
+    // webkitCompassHeading on iOS, alpha on Android (need to invert)
+    let heading = e.webkitCompassHeading != null
+      ? e.webkitCompassHeading
+      : (360 - (e.alpha || 0));
+    S.currentHeading = heading;
+    const mapEl = document.getElementById('map');
+    const svgEl = document.getElementById('shot-svg');
+    // Rotate map container opposite to heading so "forward" faces up
+    mapEl.style.transform = `rotate(${-heading}deg)`;
+    mapEl.style.transformOrigin = 'center center';
+    // Counter-rotate SVG so tracer lines stay screen-oriented
+    svgEl.style.transform = `rotate(${-heading}deg)`;
+    svgEl.style.transformOrigin = 'center center';
+    // Also counter-rotate markers by updating GPS marker
+    if(gpsMarker) drawGPSMarker();
+  };
+  window.addEventListener('deviceorientation', S.compassListener, true);
+}
 
 // ═══ MARKERS ═══
 function makeGolfBallIcon(drag){
@@ -1157,6 +1332,11 @@ function confirmModal(){
 
 // ═══ TABS ═══
 function switchTab(tab){
+  // Clear pins when switching map modes
+  const wasMapMode = S.activeTab==='map'||S.activeTab==='photo-map';
+  const isMapMode = tab==='map'||tab==='photo-map';
+  const switchingModes = wasMapMode && isMapMode && tab!==S.activeTab;
+  if(switchingModes || (wasMapMode && !isMapMode)) clearPins();
   S.activeTab=tab;
   // Mode
   if(tab==='map')S.mode='golf';
