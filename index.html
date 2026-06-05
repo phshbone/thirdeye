@@ -297,6 +297,99 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Raleway',sans-seri
 .modal-ok{background:rgba(134,239,172,0.08);color:var(--accent);border:1px solid rgba(134,239,172,0.25);border-radius:10px;font-family:'Cinzel',serif;font-size:15px;font-weight:600;letter-spacing:2px;padding:12px;cursor:pointer;}
 .modal-ok.photo{background:rgba(96,165,250,0.08);color:var(--photo-accent);border-color:rgba(96,165,250,0.25);}
 .modal-cancel{background:rgba(239,68,68,0.05);color:rgba(239,68,68,0.6);border:1px solid rgba(239,68,68,0.15);border-radius:10px;font-family:'Cinzel',serif;font-size:15px;font-weight:600;letter-spacing:2px;padding:12px;cursor:pointer;}
+/* COIN BUTTON */
+#coin-btn{
+  position:fixed;right:12px;
+  bottom:calc(68px + 14px + 40px * 4 + 5px * 4 + 12px);
+  z-index:400;width:52px;height:52px;border-radius:50%;
+  background:radial-gradient(circle at 35% 28%,#fde68a,#fbbf24 50%,#d97706 80%,#92400e);
+  border:2px solid rgba(251,191,36,0.5);
+  box-shadow:0 0 0 0 rgba(251,191,36,0.3),0 4px 16px rgba(0,0,0,0.6);
+  cursor:pointer;display:none;align-items:center;justify-content:center;
+  transition:transform .15s;
+  animation:coinPulse 3s ease-in-out infinite;
+}
+#coin-btn.show{display:flex;}
+#coin-btn:active{transform:scale(0.9);}
+@keyframes coinPulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(251,191,36,0.3),0 4px 16px rgba(0,0,0,0.6);}
+  50%{box-shadow:0 0 0 8px rgba(251,191,36,0),0 4px 16px rgba(0,0,0,0.6);}
+}
+
+/* SHOT LOG BUTTON */
+#shot-log-btn{
+  position:fixed;left:12px;bottom:calc(68px + 14px);z-index:400;
+  display:none;background:rgba(4,4,6,0.85);backdrop-filter:blur(14px);
+  border:1px solid rgba(251,191,36,0.25);border-radius:10px;
+  color:rgba(251,191,36,0.7);font-family:'Oswald',sans-serif;
+  font-size:10px;letter-spacing:2px;padding:8px 12px;cursor:pointer;
+}
+#shot-log-btn.show{display:block;}
+
+/* BOTTOM SHEET — Club Picker */
+#club-sheet{
+  position:fixed;bottom:0;left:0;right:0;z-index:600;
+  background:rgba(6,10,6,0.98);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);
+  border-top:1px solid rgba(134,239,172,0.15);border-radius:24px 24px 0 0;
+  padding:0 0 max(24px,env(safe-area-inset-bottom,24px));
+  transform:translateY(100%);
+  transition:transform .35s cubic-bezier(0.32,0.72,0,1);
+  box-shadow:0 -8px 40px rgba(0,0,0,0.7);
+}
+#club-sheet.open{transform:translateY(0);}
+.sheet-handle{width:36px;height:4px;border-radius:2px;background:rgba(134,239,172,0.2);margin:12px auto 0;}
+.sheet-header{display:flex;align-items:flex-start;justify-content:space-between;padding:14px 20px 8px;}
+.sheet-title{font-family:'Cinzel',serif;font-size:13px;font-weight:700;color:var(--accent);letter-spacing:3px;}
+#sheet-from-last{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1.5px;color:rgba(251,191,36,0.65);margin-top:4px;display:none;}
+#sheet-from-last.show{display:block;}
+.sheet-dist-wrap{text-align:right;}
+.sheet-dist{font-family:'Cinzel',serif;font-size:26px;font-weight:700;color:var(--white);letter-spacing:2px;line-height:1;}
+.sheet-dist-unit{font-family:'Oswald',sans-serif;font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:2px;}
+.sheet-close{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:5px 12px;font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.3);cursor:pointer;white-space:nowrap;}
+.club-picker-list{display:flex;gap:8px;padding:6px 16px 12px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.club-picker-list::-webkit-scrollbar{display:none;}
+.club-pick-card{flex-shrink:0;scroll-snap-align:center;width:68px;border-radius:16px;border:1.5px solid rgba(134,239,172,0.1);background:rgba(255,255,255,0.03);display:flex;flex-direction:column;align-items:center;padding:12px 6px 10px;cursor:pointer;transition:all .18s;position:relative;}
+.club-pick-card:active{transform:scale(0.94);}
+.club-pick-card.suggested{border-color:rgba(251,191,36,0.5);background:rgba(251,191,36,0.06);box-shadow:0 0 14px rgba(251,191,36,0.1);}
+.club-pick-card.selected{border-color:var(--accent);background:rgba(134,239,172,0.1);box-shadow:0 0 18px rgba(134,239,172,0.14);}
+.club-pick-card.no-dist{opacity:0.3;}
+.club-pick-name{font-family:'Cinzel',serif;font-size:16px;font-weight:700;color:var(--white);letter-spacing:1px;line-height:1;margin-bottom:5px;}
+.club-pick-dist{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1px;color:rgba(134,239,172,0.6);}
+.club-pick-badge{position:absolute;top:-7px;right:-7px;background:var(--gold);border-radius:8px;font-family:'Oswald',sans-serif;font-size:8px;letter-spacing:1px;color:#000;padding:2px 5px;font-weight:700;}
+#sheet-confirm{margin:4px 16px 0;width:calc(100% - 32px);padding:16px;border-radius:14px;background:rgba(134,239,172,0.1);border:1px solid rgba(134,239,172,0.3);color:var(--accent);font-family:'Cinzel',serif;font-size:15px;font-weight:700;letter-spacing:2px;cursor:pointer;transition:all .2s;}
+#sheet-confirm:active{background:rgba(134,239,172,0.18);transform:scale(0.98);}
+#sheet-confirm.no-club{background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.07);color:rgba(255,255,255,0.2);cursor:default;}
+
+/* SHOT LOG PANEL */
+#shot-log-panel{
+  position:fixed;bottom:0;left:0;right:0;z-index:700;
+  background:rgba(4,8,4,0.98);backdrop-filter:blur(30px);
+  border-top:1px solid rgba(251,191,36,0.15);border-radius:24px 24px 0 0;
+  max-height:70vh;transform:translateY(100%);
+  transition:transform .35s cubic-bezier(0.32,0.72,0,1);
+  padding-bottom:max(24px,env(safe-area-inset-bottom,24px));
+  overflow:hidden;display:flex;flex-direction:column;
+}
+#shot-log-panel.open{transform:translateY(0);}
+.log-handle{width:36px;height:4px;border-radius:2px;background:rgba(251,191,36,0.2);margin:12px auto 0;}
+.log-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px 10px;flex-shrink:0;border-bottom:1px solid rgba(251,191,36,0.07);}
+.log-title{font-family:'Cinzel',serif;font-size:14px;font-weight:700;color:var(--gold);letter-spacing:3px;}
+.log-clear{background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:8px;padding:5px 10px;font-family:'Oswald',sans-serif;font-size:9px;letter-spacing:2px;color:rgba(239,68,68,0.5);cursor:pointer;}
+.log-scroll{overflow-y:auto;flex:1;padding:10px 16px 8px;}
+.log-scroll::-webkit-scrollbar{width:3px;}
+.log-scroll::-webkit-scrollbar-thumb{background:rgba(251,191,36,0.15);border-radius:2px;}
+.log-entry{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+.log-entry:last-child{border-bottom:none;}
+.log-num{width:28px;height:28px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fde68a,#fbbf24 55%,#d97706);display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:12px;font-weight:700;color:#000;flex-shrink:0;}
+.log-info{flex:1;}
+.log-club{font-family:'Cinzel',serif;font-size:16px;font-weight:600;color:var(--white);letter-spacing:1px;line-height:1;}
+.log-details{font-family:'Oswald',sans-serif;font-size:11px;color:rgba(255,255,255,0.3);letter-spacing:1.5px;margin-top:2px;}
+.log-dist{font-family:'Cinzel',serif;font-size:20px;font-weight:700;color:var(--accent);letter-spacing:1px;text-align:right;}
+.log-dist-unit{font-family:'Oswald',sans-serif;font-size:9px;color:rgba(134,239,172,0.4);letter-spacing:2px;}
+.log-empty{padding:30px;text-align:center;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:2px;color:rgba(255,255,255,0.15);}
+.log-total{padding:12px 20px;border-top:1px solid rgba(251,191,36,0.1);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.log-total-label{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:2px;color:rgba(251,191,36,0.5);}
+.log-total-val{font-family:'Cinzel',serif;font-size:18px;font-weight:700;color:var(--gold);letter-spacing:1px;}
 
 /* Toast */
 #toast{position:fixed;bottom:calc(68px + 14px);left:50%;transform:translateX(-50%);z-index:9000;font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:2px;padding:9px 20px;border-radius:20px;box-shadow:0 4px 20px rgba(0,0,0,0.5);opacity:0;pointer-events:none;transition:opacity .3s;white-space:nowrap;}
@@ -785,6 +878,49 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Raleway',sans-seri
       </svg>
     </button>
   </div>
+<!-- COIN BUTTON -->
+<button id="coin-btn" onclick="dropCoin()">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <circle cx="12" cy="12" r="10" fill="rgba(0,0,0,0.18)" stroke="rgba(0,0,0,0.25)" stroke-width="1.2"/>
+    <circle cx="12" cy="12" r="7.5" fill="none" stroke="rgba(0,0,0,0.15)" stroke-width="1"/>
+    <text x="12" y="16" text-anchor="middle" font-size="11" font-family="serif" font-weight="900" fill="rgba(0,0,0,0.55)">🪙</text>
+  </svg>
+</button>
+
+<!-- SHOT LOG BUTTON -->
+<button id="shot-log-btn" onclick="openShotLog()">🪙 SHOTS</button>
+
+<!-- BOTTOM SHEET — Club Picker -->
+<div id="club-sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div style="flex:1;">
+      <div class="sheet-title">PICK YOUR CLUB</div>
+      <div id="sheet-from-last"></div>
+    </div>
+    <div class="sheet-dist-wrap" style="margin:0 16px;">
+      <div class="sheet-dist"><span id="sheet-dist-num">0</span></div>
+      <div class="sheet-dist-unit">YDS TO FLAG</div>
+    </div>
+    <button class="sheet-close" onclick="closeClubSheet()">CLOSE</button>
+  </div>
+  <div class="club-picker-list" id="club-picker-list"></div>
+  <button id="sheet-confirm" class="no-club" onclick="confirmClubPick()">SELECT A CLUB</button>
+</div>
+
+<!-- SHOT LOG PANEL -->
+<div id="shot-log-panel">
+  <div class="log-handle"></div>
+  <div class="log-header">
+    <div class="log-title">🪙 SHOT TRACKER</div>
+    <button class="log-clear" onclick="clearShotLog()">CLEAR ROUND</button>
+  </div>
+  <div class="log-scroll" id="log-scroll"></div>
+  <div class="log-total" id="log-total" style="display:none;">
+    <span class="log-total-label">TOTAL DISTANCE</span>
+    <span class="log-total-val" id="log-total-val">0 YDS</span>
+  </div>
+</div>
 
   <button id="clear-pins-btn" onclick="clearPins()">✕ CLEAR PINS</button>
   <div id="pin-legend"></div>
@@ -898,7 +1034,10 @@ const S = {
   dragging:false, dragStart:null, lastDragPt:null, dragVal:0,
   droppedPins:[], activeTab:'map', mode:'golf',
   windDeg:null, windSpeedMph:null, windDir:null,
-  modalFor:'golf',
+  modalFor:'golf',shotLog:[],
+coinMarker:null,
+coinPos:null,
+selectedClub:null,
 };
 
 let map, gpsMarker, SVG;
@@ -1365,6 +1504,196 @@ const ts=document.createElement('style');
 ts.textContent=`.yrd-tip{background:rgba(5,5,15,0.92)!important;border:1px solid rgba(255,255,255,0.15)!important;color:#e2e8f0!important;font-family:'Cinzel',serif!important;font-size:13px!important;letter-spacing:1px!important;border-radius:6px!important;padding:3px 8px!important;box-shadow:0 2px 8px rgba(0,0,0,0.5)!important;transform:none!important;direction:ltr!important;unicode-bidi:normal!important;}.yrd-tip::before{display:none!important;}.leaflet-tooltip{transform:none!important;}`;
 document.head.appendChild(ts);
 
+// ═══ COIN MARKER ICON ═══
+function makeCoinIcon(num){
+  const html=`<div style="display:flex;flex-direction:column;align-items:center;filter:drop-shadow(0 3px 8px rgba(0,0,0,0.7));">
+    <div style="width:32px;height:32px;border-radius:50%;
+      background:radial-gradient(circle at 35% 28%,#fde68a,#fbbf24 50%,#d97706 80%,#92400e);
+      border:2px solid rgba(251,191,36,0.6);
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Cinzel',serif;font-size:13px;font-weight:700;color:rgba(0,0,0,0.7);
+      box-shadow:0 0 12px rgba(251,191,36,0.4);">
+      ${num}
+    </div>
+    <div style="width:2px;height:8px;background:linear-gradient(to bottom,#d97706,rgba(217,119,6,0));margin-top:-1px;"></div>
+  </div>`;
+  return L.divIcon({className:'',html,iconSize:[32,42],iconAnchor:[16,42]});
+}
+
+// ═══ COIN DROP ═══
+function updateCoinBtn(){
+  const btn=document.getElementById('coin-btn');
+  if(S.activeTab==='map'&&S.gpsPos){btn.classList.add('show');}
+  else{btn.classList.remove('show');}
+}
+
+function dropCoin(){
+  if(!S.gpsPos)return;
+  const coinNum=S.shotLog.length+1;
+  if(S.coinMarker){map.removeLayer(S.coinMarker);S.coinMarker=null;}
+  S.coinPos={lat:S.gpsPos.lat,lng:S.gpsPos.lng};
+  const icon=makeCoinIcon(coinNum);
+  S.coinMarker=L.marker([S.coinPos.lat,S.coinPos.lng],{icon,interactive:false,zIndexOffset:900}).addTo(map);
+  let fromLast=null;
+  if(S.shotLog.length>0){
+    const prev=S.shotLog[S.shotLog.length-1];
+    fromLast=Math.round(haversineYards(prev.latlng.lat,prev.latlng.lng,S.coinPos.lat,S.coinPos.lng));
+  }
+  openClubSheet(fromLast);
+  if(navigator.vibrate)navigator.vibrate([30,15,60,15,30]);
+}
+
+// ═══ CLUB SHEET ═══
+function openClubSheet(fromLast){
+  S.selectedClub=null;
+  const dist=S.dragVal||0;
+  document.getElementById('sheet-dist-num').textContent=dist;
+  const fromEl=document.getElementById('sheet-from-last');
+  if(fromLast!==null&&fromLast>0){
+    fromEl.textContent='🪙 SHOT: '+fromLast+' YDS FROM LAST COIN';
+    fromEl.classList.add('show');
+  } else {
+    fromEl.classList.remove('show');
+  }
+  buildClubPicker(dist);
+  updateSheetConfirm();
+  document.getElementById('club-sheet').classList.add('open');
+  document.getElementById('coin-btn').style.pointerEvents='none';
+}
+
+function buildClubPicker(targetYards){
+  const list=document.getElementById('club-picker-list');
+  list.innerHTML='';
+  const data=ld('ce-clubs-'+activeGolfCourse,{});
+  let suggestedIdx=-1;let bestDiff=Infinity;
+  CLUBS.forEach((c,i)=>{
+    const v=parseInt(data[c]);
+    if(v&&v>0){const diff=Math.abs(v-targetYards);if(diff<bestDiff){bestDiff=diff;suggestedIdx=i;}}
+  });
+  CLUBS.forEach((c,i)=>{
+    const v=parseInt(data[c]);
+    const card=document.createElement('div');
+    card.className='club-pick-card'+(suggestedIdx===i?' suggested':'')+(v?'':' no-dist');
+    card.dataset.idx=i;
+    card.innerHTML=`
+      <div class="club-pick-name">${CLUB_SHORT[i]}</div>
+      <div class="club-pick-dist">${v?v+'y':'—'}</div>
+      ${suggestedIdx===i?'<div class="club-pick-badge">▶</div>':''}
+    `;
+    card.onclick=()=>selectClub(i,card);
+    list.appendChild(card);
+  });
+  if(suggestedIdx>=0){
+    S.selectedClub=suggestedIdx;
+    setTimeout(()=>{
+      const cards=list.querySelectorAll('.club-pick-card');
+      if(cards[suggestedIdx]){
+        cards[suggestedIdx].classList.add('selected');
+        cards[suggestedIdx].scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+      }
+      updateSheetConfirm();
+    },80);
+  }
+}
+
+function selectClub(idx,el){
+  S.selectedClub=idx;
+  document.querySelectorAll('.club-pick-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  updateSheetConfirm();
+  if(navigator.vibrate)navigator.vibrate(20);
+}
+
+function updateSheetConfirm(){
+  const btn=document.getElementById('sheet-confirm');
+  if(S.selectedClub!==null){
+    btn.textContent='LOG SHOT — '+CLUB_SHORT[S.selectedClub]+' ✓';
+    btn.className='';
+  } else {
+    btn.textContent='SELECT A CLUB';
+    btn.className='no-club';
+  }
+}
+
+function closeClubSheet(){
+  document.getElementById('club-sheet').classList.remove('open');
+  document.getElementById('coin-btn').style.pointerEvents='';
+}
+
+function confirmClubPick(){
+  if(S.selectedClub===null)return;
+  const club=CLUBS[S.selectedClub];
+  const clubShort=CLUB_SHORT[S.selectedClub];
+  const dist=parseInt(document.getElementById('sheet-dist-num').textContent)||0;
+  let fromLast=null;
+  if(S.shotLog.length>0&&S.coinPos){
+    const prev=S.shotLog[S.shotLog.length-1];
+    fromLast=Math.round(haversineYards(prev.latlng.lat,prev.latlng.lng,S.coinPos.lat,S.coinPos.lng));
+  }
+  S.shotLog.push({club,clubShort,dist,fromLast,latlng:{lat:S.coinPos.lat,lng:S.coinPos.lng},timestamp:Date.now()});
+  closeClubSheet();
+  document.getElementById('shot-log-btn').classList.add('show');
+  showToast('🪙 '+clubShort+' — '+dist+'y logged','coin',2200);
+  if(navigator.vibrate)navigator.vibrate([40,20,80]);
+}
+
+// ═══ SHOT LOG PANEL ═══
+function openShotLog(){
+  renderShotLog();
+  document.getElementById('shot-log-panel').classList.add('open');
+}
+function closeShotLog(){
+  document.getElementById('shot-log-panel').classList.remove('open');
+}
+function renderShotLog(){
+  const scroll=document.getElementById('log-scroll');
+  const total=document.getElementById('log-total');
+  const totalVal=document.getElementById('log-total-val');
+  scroll.innerHTML='';
+  if(S.shotLog.length===0){
+    scroll.innerHTML='<div class="log-empty">NO SHOTS LOGGED YET<br/>DROP A COIN TO START TRACKING</div>';
+    total.style.display='none';return;
+  }
+  let totalDist=0;
+  S.shotLog.forEach((shot,i)=>{
+    const entry=document.createElement('div');entry.className='log-entry';
+    const fromStr=shot.fromLast!==null?'Shot: '+shot.fromLast+'y':'First ball';
+    const timeStr=new Date(shot.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    entry.innerHTML=`
+      <div class="log-num">${i+1}</div>
+      <div class="log-info">
+        <div class="log-club">${shot.clubShort}</div>
+        <div class="log-details">${fromStr} · ${timeStr}</div>
+      </div>
+      <div>
+        <div class="log-dist">${shot.dist}</div>
+        <div class="log-dist-unit">YDS TO FLAG</div>
+      </div>
+    `;
+    scroll.appendChild(entry);
+    if(shot.fromLast)totalDist+=shot.fromLast;
+  });
+  if(totalDist>0){total.style.display='flex';totalVal.textContent=totalDist+' YDS';}
+  else{total.style.display='none';}
+}
+function clearShotLog(){
+  if(!confirm('Clear all shots for this round?'))return;
+  S.shotLog=[];
+  if(S.coinMarker){map.removeLayer(S.coinMarker);S.coinMarker=null;}
+  S.coinPos=null;
+  document.getElementById('shot-log-btn').classList.remove('show');
+  renderShotLog();
+  showToast('Round cleared','neutral',1800);
+}
+
+// Close panels on outside tap
+document.addEventListener('click',function(e){
+  const panel=document.getElementById('shot-log-panel');
+  if(panel.classList.contains('open')&&!panel.contains(e.target)&&e.target.id!=='shot-log-btn'){closeShotLog();}
+  const sheet=document.getElementById('club-sheet');
+  if(sheet.classList.contains('open')&&!sheet.contains(e.target)&&e.target.id!=='coin-btn'){closeClubSheet();}
+});
+
 // ═══ CONVERSIONS ═══
 function pxToYards(px){
   if(!S.gpsPos||!map)return 0;
@@ -1669,6 +1998,9 @@ function switchTab(tab){
   document.getElementById('tab-settings').classList.toggle('active',tab==='settings');
   // Update marker when switching between golf/photo map
   if((tab==='map'||tab==='photo-map')&&S.gpsPos)drawGPSMarker();
+  updateCoinBtn();
+closeClubSheet();
+document.getElementById('shot-log-panel').classList.remove('open');
   if(tab==='clubs'){renderCourseSelectorClub();renderClubList();}
   if(tab==='photo-guide'){renderLocationSelectorPhoto();renderGearList();}
   if(tab==='settings')renderManageLists();
@@ -1679,7 +2011,7 @@ let toastTm;
 function showToast(msg,type='golf',dur=2200){
   const t=document.getElementById('toast');
   t.textContent=msg;
-  t.className=type==='golf'?'show golf-toast':type==='photo'?'show photo-toast':'show neutral-toast';
+  t.className=type==='golf'?'show golf-toast':type==='photo'?'show photo-toast':type==='coin'?'show coin-toast':'show neutral-toast';
   clearTimeout(toastTm);toastTm=setTimeout(()=>t.classList.remove('show'),dur);
 }
 
