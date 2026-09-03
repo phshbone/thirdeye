@@ -11,8 +11,7 @@ jobs:
   smoke-test:
     runs-on: ubuntu-latest
     env:
-      LIVE_SMOKE_URL: https://phshbone.github.io/thirdeye/
-      DEPLOY_IDENTITY_FILES: index.html
+      PRODUCTION_URL: https://phshbone.github.io/thirdeye/
 
     steps:
       - name: Checkout
@@ -29,11 +28,28 @@ jobs:
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 
-      - name: Wait for exact deployed build
+      - name: Start exact cleanup preview
+        if: github.ref_name == 'cleanup-smoke-test'
+        shell: bash
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/third-eye-preview.log 2>&1 &
+          echo $! > /tmp/third-eye-preview.pid
+          for i in {1..20}; do
+            if curl --fail --silent http://127.0.0.1:4173/index.html >/dev/null; then
+              echo 'Exact cleanup checkout is live on local preview.'
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/third-eye-preview.log || true
+          exit 1
+
+      - name: Verify exact production deployment
+        if: github.ref_name == 'main'
         shell: bash
         run: |
           set -euo pipefail
-          base="${LIVE_SMOKE_URL%/}"
+          base="${PRODUCTION_URL%/}"
           deadline=$((SECONDS + 300))
           while true; do
             tmp="$(mktemp)"
@@ -44,18 +60,27 @@ jobs:
                 "${base}/index.html?live-smoke-rev=${rev}" -o "$tmp" \
                 && cmp -s index.html "$tmp"; then
               rm -f "$tmp"
-              echo "Exact deployed index.html verified."
+              echo 'Exact deployed index.html verified.'
               break
             fi
             rm -f "$tmp"
             if [ "$SECONDS" -ge "$deadline" ]; then
-              echo "Timed out waiting for deployed index.html to match checkout."
+              echo 'Timed out waiting for deployed index.html to match checkout.'
               exit 1
             fi
             sleep 10
           done
 
-      - name: Run live smoke test
+      - name: Run browser smoke test on cleanup preview
+        if: github.ref_name == 'cleanup-smoke-test'
+        env:
+          LIVE_SMOKE_URL: http://127.0.0.1:4173/
+        run: npm run test:live-smoke
+
+      - name: Run Live Smoke Test on deployed production
+        if: github.ref_name == 'main'
+        env:
+          LIVE_SMOKE_URL: https://phshbone.github.io/thirdeye/
         run: npm run test:live-smoke
 
       - name: Upload Playwright report
