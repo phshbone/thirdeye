@@ -6,50 +6,68 @@ Production target: `https://phshbone.github.io/thirdeye/`
 
 ## Primary classification
 
-**FAIL — REPAIR REQUIRED**
+**FAIL — REPAIR IN PROGRESS**
 
-The current production build is usable enough for field testing, and the new Live Smoke Test harness itself is now verified working. Product-level state and interaction defects still need cleanup before this branch becomes the new stable baseline.
+The production build remains untouched on `main`. Cleanup is isolated on `cleanup-smoke-test`. The repository-owned Playwright harness is operational, and cleanup-branch browser testing now runs against an exact local preview of the checked-out branch while production Live Smoke Test remains reserved for the exact deployed `main` revision.
 
 ## Confirmed working behavior
 
 - App launches and renders.
 - Golf mode loads satellite map, GPS marker, course HUD, wind display, controls, and bottom navigation.
-- Multiple golf target flags can be placed and remain numbered in sequence up to the current hard-coded limit.
-- Per-target yardage is displayed and persists in the visible target list during the active map session.
-- Golf ball/coin action control is present.
-- Club picker bottom sheet exists and can open.
+- Multiple golf target flags can be placed and remain numbered in sequence.
+- Per-target yardage is displayed in the visible target list.
+- Golf ball/coin action control exists.
+- Club picker bottom sheet exists.
 - Shot log infrastructure exists in source.
 - Course profiles and photo location profiles exist.
-- Hunt mode is currently a Coming Soon placeholder.
+- Photo drag-from-GPS measurement works when the intended gesture is used.
+- Hunt mode remains a Coming Soon placeholder.
 
-## Confirmed defects / warnings from human field test + source inspection
+## Cleanup pass 1 — applied
 
-### High — target list silently clears after six targets
-Field testing appeared to lose flags unexpectedly. Source inspection found the exact cause: `dropPin()` executes `clearPins()` when the next target number would exceed 6. This is not an accidental Clear Pins tap. The hard-coded six-target reset must be removed or replaced with an explicit, intentional limit.
+The first repair pass changed only the cleanup branch and addressed field-test defects directly:
 
-### High — ball/coin marker history is visually replaced
-Dropping a later ball marker removes the previous visible marker. Source stores a singleton `S.coinMarker` and explicitly removes it before creating the next marker. Cleanup direction: preserve every recorded shot location, keep the current marker visually dominant, and shrink previous markers into small breadcrumbs.
+- Removed the silent six-target reset that was clearing flags after target 6.
+- Added one-tap **Undo Last** for accidental target placement.
+- Preserved previous ball/coin positions as small breadcrumb markers instead of deleting them.
+- Added explicit Golf/Photo shot-marker ownership so Golf shot markers are hidden in Photo mode and restored in Golf.
+- Repaired the club-sheet outside-click logic to recognize taps on SVG children inside the coin button.
+- Cleared live target pins on golf-course switch so one course's active targets do not bleed into another course.
+- Added an explicit Photo-mode instruction toast: drag from the lens marker to the subject.
 
-### High — Golf → Photo mode leaves stale Golf shot-marker state
-Golf target pins clear during a Golf → Photo switch, but the separate Golf coin/shot marker is not part of `clearPins()` and can remain. The shared GPS marker is redrawn for Photo, while Golf shot-marker state survives independently. Mode ownership needs to be explicit.
+## Expanded Playwright result after cleanup pass 1
 
-### High — Photo interaction is undiscoverable
-Repeated map taps in Photo mode do nothing by design: `onMapTap()` currently accepts Golf/Hunt only. Photo uses drag-from-GPS-marker measurement. The live UI does not explain that interaction, so a human tester reasonably interpreted the mode as broken after repeated taps. Cleanup must either expose the drag affordance clearly or intentionally adopt a tap-first Photo workflow.
+The new regression suite runs four behaviors in both desktop Chromium and iPhone-like Chromium (8 checks total).
 
-### High — club picker can immediately close after coin-button child tap
-The outside-click handler excludes only `e.target.id === 'coin-btn'`. A tap landing on the SVG/circle/text inside that button has a different event target and can therefore be treated as an outside click after the sheet opens. This matches the field report that the drawer opens inconsistently.
+**Passed:**
 
-### Medium — course switching does not isolate active target state
-Switching between `Pinchbrook` and `My Home Course` leaves the same live targets visible because `cycleCourse()` changes only the active course/profile and club data. Map targets currently belong to the session, not the course.
+- Critical shell and Golf/Photo switching.
+- Photo instruction is visible.
+- Photo's intended drag gesture successfully creates a photo measurement pin.
+- More than six Golf targets can now be created; the old silent reset did not recur.
+- Undo reduced the target count correctly before the later visibility assertion failed.
 
-### Medium — no Undo Last Target
-Accidental target placement requires clearing all targets. Field testing produced accidental flags. Add a one-tap Undo Last Target before expanding the feature set.
+**Failures exposed by Playwright:**
 
-### Medium — small GPS drift
-A stationary drift of roughly a few feet was observed. This is normal phone-GPS behavior, but raw point-to-point movement should eventually have confidence/smoothing rules before becoming authoritative Personal Caddy training data.
+1. `clearPins()` removed the button's CSS class but an inline `display:block` remained, so the Clear Pins control could stay visibly present after targets were gone.
+2. The coin action button was still hidden immediately after first GPS lock. This exactly reproduces the human-test discovery that tapping the Golf tab was required before the coin control appeared. `updateCoinBtn()` was only being called during tab switching, not when GPS first became available.
 
-### UX — top HUD consumes more map area than necessary
-The separate wind panel hangs below the course bar. The consolidated bench-style HUD remains the cleanup direction.
+These were product defects, not test-harness defects.
+
+## Cleanup pass 2 — applied
+
+- `onGPS()` now synchronizes the coin button as soon as location is available, removing the need to re-tap Golf after launch.
+- `clearPins()` now clears both CSS classes and inline display state for Clear Pins and Undo Last, preventing stale controls after a course switch or clear action.
+
+The next automated run is intended to exercise the same 8 regression checks again against the repaired cleanup branch.
+
+## Remaining cleanup targets
+
+- Verify the club drawer remains open when the nested SVG inside the coin button receives the tap.
+- Verify breadcrumb creation and Golf→Photo hiding now that the coin control is available immediately after GPS lock.
+- Consolidate the Golf HUD into the compact bench layout after functional repairs are green.
+- Review the coin/dime visual treatment after behavior is stable.
+- Keep GPS drift as a later confidence/smoothing concern rather than blocking this cleanup.
 
 ## Product behavior to preserve
 
@@ -61,38 +79,24 @@ The separate wind panel hangs below the course bar. The consolidated bench-style
 - One-handed, low-friction field workflow.
 - Golf / Photo / Hunt visual language and bottom navigation.
 
-## Repair priorities before feature expansion
+## Test architecture
 
-1. Remove the silent six-target reset.
-2. Repair Golf/Photo marker and state ownership.
-3. Preserve shot-marker history as small breadcrumbs.
-4. Repair club-picker event handling so it opens deterministically.
-5. Add Undo Last Target.
-6. Decide and implement course-target isolation behavior.
-7. Make Photo interaction explicit and testable.
-8. Consolidate the Golf HUD into the bench layout.
-9. Re-run Smoke Test and Live Smoke Test against the exact repaired build.
-10. Human field test the stabilized branch.
-11. Then route the stabilized baseline through Puppet Master for the more efficient next-phase build.
-
-## Live Smoke Test status
-
-Repository-owned Playwright/GitHub Actions harness on `cleanup-smoke-test`:
+Repository-owned browser harness:
 
 - `package.json`
 - `playwright.config.js`
 - `tests/live-smoke.spec.js`
 - `.github/workflows/smoke-test.yml`
 
-### First run
-**FAIL — HARNESS DEFECT, not product evidence.**
+For `cleanup-smoke-test`, GitHub Actions serves the exact branch checkout on a local HTTP preview and drives it with Playwright in desktop and iPhone-like Chromium. This gives browser-level second-eye testing before merge without replacing the public production app.
 
-Playwright used `page.goto('/')` while the configured GitHub Pages base URL was a project site (`/thirdeye/`). The leading slash resolved to `https://phshbone.github.io/`, producing the GitHub Pages 404 page. The exact-deployment identity check had already succeeded, which helped isolate the failure to browser navigation rather than deployment.
+For `main`, the workflow verifies that the public GitHub Pages `index.html` exactly matches the tested commit before running Live Smoke Test against `https://phshbone.github.io/thirdeye/`.
 
-### Harness repair
-Changed browser navigation to the project-relative `page.goto('./')` so the `/thirdeye/` path is preserved.
+## Gate before Puppet Master
 
-### Verification run
-**PASS.** Run 3 completed successfully on commit `93a9721a77a0292710a099c52d3ac8e4f475ae04` in both desktop Chromium and iPhone-like Chromium. Checkout, dependency install, Playwright Chromium install, exact deployed-build verification, browser smoke tests, and report upload all passed.
-
-This verifies that Live Smoke Test itself is operational. It does **not** reclassify the product baseline as PASS; the confirmed field-test defects above remain the cleanup targets.
+1. Cleanup branch browser regression suite passes.
+2. Bench HUD cleanup is applied and regression-tested.
+3. Human field test on the stabilized build.
+4. Merge/deploy only after the cleanup baseline is accepted.
+5. Run exact-deployed Live Smoke Test on `main`.
+6. Then route the stabilized baseline through Puppet Master for the more efficient next-phase build and Personal Caddy architecture.
