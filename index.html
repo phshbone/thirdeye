@@ -1158,6 +1158,7 @@ function onGPS(lat,lng){
     }
   }
   drawGPSMarker();
+  updateCoinBtn();
 }
 function recenter(){
   S.userPanned=false;
@@ -1497,7 +1498,9 @@ function clearPins(){
   S.droppedPins.forEach(p=>{if(map.hasLayer(p.marker))map.removeLayer(p.marker);});
   S.droppedPins=[];
   document.getElementById('clear-pins-btn').classList.remove('show');
+  document.getElementById('clear-pins-btn').style.display='none';
   document.getElementById('undo-pin-btn').classList.remove('show');
+  document.getElementById('undo-pin-btn').style.display='none';
   updatePinLegend();
 }
 function undoLastPin(){
