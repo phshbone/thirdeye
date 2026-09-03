@@ -204,6 +204,14 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Raleway',sans-seri
   transition:all .2s;
 }
 #clear-pins-btn.show{display:block;}
+#undo-pin-btn{
+  position:fixed;left:12px;bottom:calc(68px + 52px);z-index:400;
+  background:rgba(4,4,6,0.85);backdrop-filter:blur(14px);
+  border:1px solid rgba(134,239,172,0.28);border-radius:10px;
+  color:rgba(134,239,172,0.85);font-family:'Oswald',sans-serif;
+  font-size:10px;letter-spacing:2px;padding:8px 12px;cursor:pointer;display:none;
+}
+#undo-pin-btn.show{display:block;}
 #pin-legend{position:fixed;left:12px;bottom:calc(68px + 132px);z-index:400;display:flex;flex-direction:column;gap:4px;}
 .pin-legend-item{
   background:rgba(4,4,6,0.85);backdrop-filter:blur(12px);
@@ -922,6 +930,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Raleway',sans-seri
   </div>
 </div>
 
+  <button id="undo-pin-btn" onclick="undoLastPin()">↶ UNDO LAST</button>
   <button id="clear-pins-btn" onclick="clearPins()">✕ CLEAR PINS</button>
   <div id="pin-legend"></div>
 
@@ -1036,6 +1045,7 @@ const S = {
   windDeg:null, windSpeedMph:null, windDir:null,
   modalFor:'golf',shotLog:[],
 coinMarker:null,
+coinMarkers:[],
 coinPos:null,
 selectedClub:null,
 };
@@ -1470,24 +1480,36 @@ function onDE(){
 
 function dropPin(){
   const num=S.droppedPins.length+1;
-  if(num>6){clearPins();}
   const icon=S.mode==='golf'?makeGolfFlagIcon(S.droppedPins.length+1):makeLensDropIcon(S.droppedPins.length+1);
   const latlng=map.containerPointToLatLng(L.point(S.lastDragPt.x,S.lastDragPt.y));
   const marker=L.marker(latlng,{icon,interactive:false}).addTo(map);
   const label=S.mode==='golf'?S.dragVal+'y':S.dragVal+'yd';
   marker.bindTooltip(label,{permanent:true,className:'yrd-tip',direction:'right',offset:[10,-22]});
-  S.droppedPins.push({marker,val:S.dragVal,num:S.droppedPins.length+1,mode:S.mode});
-  // Always show clear button when pins exist on any map tab
+  S.droppedPins.push({marker,val:S.dragVal,num:S.droppedPins.length+1,mode:S.mode,latlng,course:S.mode==='golf'?activeGolfCourse:null,location:S.mode==='photo'?activePhotoLoc:null});
+  // Always show repair controls when targets exist on any map tab
   document.getElementById('clear-pins-btn').classList.add('show');
+  document.getElementById('undo-pin-btn').classList.add('show');
   document.getElementById('clear-pins-btn').style.display='block';
   updatePinLegend();
   if(navigator.vibrate)navigator.vibrate([60,30,60]);
 }
 function clearPins(){
-  S.droppedPins.forEach(p=>map.removeLayer(p.marker));
+  S.droppedPins.forEach(p=>{if(map.hasLayer(p.marker))map.removeLayer(p.marker);});
   S.droppedPins=[];
   document.getElementById('clear-pins-btn').classList.remove('show');
+  document.getElementById('undo-pin-btn').classList.remove('show');
   updatePinLegend();
+}
+function undoLastPin(){
+  const last=S.droppedPins.pop();
+  if(!last)return;
+  if(map.hasLayer(last.marker))map.removeLayer(last.marker);
+  if(!S.droppedPins.length){
+    document.getElementById('clear-pins-btn').classList.remove('show');
+    document.getElementById('undo-pin-btn').classList.remove('show');
+  }
+  updatePinLegend();
+  showToast('Last target removed',S.mode==='photo'?'photo':'golf',1400);
 }
 function updatePinLegend(){
   const el=document.getElementById('pin-legend');el.innerHTML='';
@@ -1520,6 +1542,20 @@ function makeCoinIcon(num){
   return L.divIcon({className:'',html,iconSize:[32,42],iconAnchor:[16,42]});
 }
 
+function makeCoinBreadcrumbIcon(num){
+  const html=`<div style="width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fde68a,#fbbf24 55%,#b45309);border:1px solid rgba(255,255,255,0.7);box-shadow:0 1px 5px rgba(0,0,0,0.65);display:flex;align-items:center;justify-content:center;font-family:'Oswald',sans-serif;font-size:7px;font-weight:700;color:#1f1300;">${num}</div>`;
+  return L.divIcon({className:'',html,iconSize:[14,14],iconAnchor:[7,7]});
+}
+
+function hideGolfShotMarkers(){
+  if(S.coinMarker&&map.hasLayer(S.coinMarker))map.removeLayer(S.coinMarker);
+  S.coinMarkers.forEach(m=>{if(map.hasLayer(m.marker))map.removeLayer(m.marker);});
+}
+function showGolfShotMarkers(){
+  S.coinMarkers.forEach(m=>{if(!map.hasLayer(m.marker))m.marker.addTo(map);});
+  if(S.coinMarker&&!map.hasLayer(S.coinMarker))S.coinMarker.addTo(map);
+}
+
 // ═══ COIN DROP ═══
 function updateCoinBtn(){
   const btn=document.getElementById('coin-btn');
@@ -1530,7 +1566,12 @@ function updateCoinBtn(){
 function dropCoin(){
   if(!S.gpsPos)return;
   const coinNum=S.shotLog.length+1;
-  if(S.coinMarker){map.removeLayer(S.coinMarker);S.coinMarker=null;}
+  if(S.coinMarker){
+    S.coinMarker.setIcon(makeCoinBreadcrumbIcon(Math.max(1,coinNum-1)));
+    S.coinMarker.setZIndexOffset(700);
+    S.coinMarkers.push({marker:S.coinMarker,latlng:S.coinPos,num:Math.max(1,coinNum-1)});
+    S.coinMarker=null;
+  }
   S.coinPos={lat:S.gpsPos.lat,lng:S.gpsPos.lng};
   const icon=makeCoinIcon(coinNum);
   S.coinMarker=L.marker([S.coinPos.lat,S.coinPos.lng],{icon,interactive:false,zIndexOffset:900}).addTo(map);
@@ -1679,7 +1720,9 @@ function renderShotLog(){
 function clearShotLog(){
   if(!confirm('Clear all shots for this round?'))return;
   S.shotLog=[];
-  if(S.coinMarker){map.removeLayer(S.coinMarker);S.coinMarker=null;}
+  if(S.coinMarker){if(map.hasLayer(S.coinMarker))map.removeLayer(S.coinMarker);S.coinMarker=null;}
+  S.coinMarkers.forEach(m=>{if(map.hasLayer(m.marker))map.removeLayer(m.marker);});
+  S.coinMarkers=[];
   S.coinPos=null;
   document.getElementById('shot-log-btn').classList.remove('show');
   renderShotLog();
@@ -1689,9 +1732,9 @@ function clearShotLog(){
 // Close panels on outside tap
 document.addEventListener('click',function(e){
   const panel=document.getElementById('shot-log-panel');
-  if(panel.classList.contains('open')&&!panel.contains(e.target)&&e.target.id!=='shot-log-btn'){closeShotLog();}
+  if(panel.classList.contains('open')&&!panel.contains(e.target)&&!e.target.closest('#shot-log-btn')){closeShotLog();}
   const sheet=document.getElementById('club-sheet');
-  if(sheet.classList.contains('open')&&!sheet.contains(e.target)&&e.target.id!=='coin-btn'){closeClubSheet();}
+  if(sheet.classList.contains('open')&&!sheet.contains(e.target)&&!e.target.closest('#coin-btn')){closeClubSheet();}
 });
 
 // ═══ CONVERSIONS ═══
@@ -1842,6 +1885,7 @@ function cycleCourse(){
   const i=golfCourses.indexOf(activeGolfCourse);
   activeGolfCourse=golfCourses[(i+1)%golfCourses.length];
   sv('ce-active-golf',activeGolfCourse);
+  clearPins();
   document.getElementById('course-name-display').textContent=activeGolfCourse.toUpperCase();
   renderCourseSelectorClub();renderClubList();
   showToast('⛳ '+activeGolfCourse,'golf',1800);
@@ -1989,6 +2033,7 @@ function switchTab(tab){
   // Show clear pins if there are pins AND we're on any map tab
   const onMap=tab==='map'||tab==='photo-map';
   document.getElementById('clear-pins-btn').style.display=onMap&&S.droppedPins.length?'block':'none';
+  document.getElementById('undo-pin-btn').style.display=onMap&&S.droppedPins.length?'block':'none';
   document.getElementById('pin-legend').style.display=onMap?'flex':'none';
   // Tab highlight
   document.getElementById('tab-map').classList.toggle('active',tab==='map');
@@ -1996,8 +2041,12 @@ function switchTab(tab){
   document.getElementById('tab-hunt').classList.toggle('active',tab==='hunt');
   document.getElementById('tab-clubs').classList.toggle('active',tab==='clubs');
   document.getElementById('tab-settings').classList.toggle('active',tab==='settings');
-  // Update marker when switching between golf/photo map
+  // Keep mode-specific shot markers from bleeding across Golf / Photo.
+  if(tab==='photo-map')hideGolfShotMarkers();
+  if(tab==='map')showGolfShotMarkers();
+  // Update the GPS marker to the active mode icon.
   if((tab==='map'||tab==='photo-map')&&S.gpsPos)drawGPSMarker();
+  if(tab==='photo-map')showToast('PHOTO: drag from the lens marker to your subject','photo',3200);
   updateCoinBtn();
 closeClubSheet();
 document.getElementById('shot-log-panel').classList.remove('open');
