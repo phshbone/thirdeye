@@ -1,0 +1,77 @@
+name: Smoke Test Action
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - cleanup-smoke-test
+      - main
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    env:
+      LIVE_SMOKE_URL: https://phshbone.github.io/thirdeye/
+      DEPLOY_IDENTITY_FILES: index.html
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Wait for exact deployed build
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="${LIVE_SMOKE_URL%/}"
+          deadline=$((SECONDS + 300))
+          while true; do
+            tmp="$(mktemp)"
+            rev="${GITHUB_SHA}-${RANDOM}"
+            if curl --fail --silent --show-error \
+                -H 'Cache-Control: no-cache, no-store, max-age=0' \
+                -H 'Pragma: no-cache' \
+                "${base}/index.html?live-smoke-rev=${rev}" -o "$tmp" \
+                && cmp -s index.html "$tmp"; then
+              rm -f "$tmp"
+              echo "Exact deployed index.html verified."
+              break
+            fi
+            rm -f "$tmp"
+            if [ "$SECONDS" -ge "$deadline" ]; then
+              echo "Timed out waiting for deployed index.html to match checkout."
+              exit 1
+            fi
+            sleep 10
+          done
+
+      - name: Run live smoke test
+        run: npm run test:live-smoke
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-results
+          path: test-results/
+          if-no-files-found: ignore
+          retention-days: 14
