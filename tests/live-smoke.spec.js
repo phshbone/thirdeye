@@ -12,7 +12,8 @@ test('Third Eye critical deployed shell and golf/photo mode switching', async ({
   const pageErrors = [];
   page.on('pageerror', error => pageErrors.push(error.message));
 
-  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  // Relative navigation preserves the /thirdeye/ GitHub Pages project path.
+  await page.goto('./', { waitUntil: 'domcontentloaded' });
   await expect(page).toHaveTitle(/Third Eye/i);
   await expect(page.locator('#splash')).toBeVisible();
   await expect(page.getByRole('button', { name: /lock on/i })).toBeVisible();
@@ -36,7 +37,7 @@ test('Third Eye critical deployed shell and golf/photo mode switching', async ({
 });
 
 test('Golf target placement remains available in deployed app', async ({ page }) => {
-  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await page.goto('./', { waitUntil: 'domcontentloaded' });
   await page.getByRole('button', { name: /lock on/i }).click();
   await expect(page.locator('#map')).toBeVisible();
 
