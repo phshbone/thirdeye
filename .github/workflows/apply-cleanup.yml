@@ -1,0 +1,51 @@
+name: Apply Third Eye Cleanup
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - cleanup-smoke-test
+    paths:
+      - scripts/cleanup-pass-1.js
+      - .github/workflows/apply-cleanup.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply-cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout cleanup branch
+        uses: actions/checkout@v4
+        with:
+          ref: cleanup-smoke-test
+
+      - name: Apply cleanup pass
+        run: node scripts/cleanup-pass-1.js
+
+      - name: Static sanity checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'id="undo-pin-btn"' index.html
+          grep -q 'coinMarkers:\[\]' index.html
+          grep -q 'PHOTO: drag from the lens marker to your subject' index.html
+          if grep -q 'if(num>6){clearPins();}' index.html; then
+            echo 'Silent six-target reset still present.'
+            exit 1
+          fi
+
+      - name: Commit repaired index
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- index.html; then
+            echo 'No index.html changes to commit.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Apply Third Eye cleanup pass 1'
+          git push origin HEAD:cleanup-smoke-test
