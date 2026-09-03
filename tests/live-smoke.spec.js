@@ -20,13 +20,17 @@ async function launch(page) {
   await page.waitForTimeout(1200);
 }
 
-test('critical shell and Golf / Photo mode ownership remain clean', async ({ page }) => {
+test('critical shell, bench HUD, and Golf / Photo mode ownership remain clean', async ({ page }) => {
   const pageErrors = [];
   page.on('pageerror', error => pageErrors.push(error.message));
 
   await launch(page);
   await expect(page.locator('#tab-map')).toHaveClass(/active/);
   await expect(page.locator('#top-hud')).toBeVisible();
+  await expect(page.locator('#hud-bar')).toBeVisible();
+  await expect(page.locator('#hud-wind-tab')).toBeVisible();
+  await expect(page.locator('#hud-switch-tab')).toBeVisible();
+  await expect(page.locator('#course-name-display')).toContainText(/TEST COURSE A/i);
 
   await page.locator('#tab-photo').click();
   await expect(page.locator('#tab-photo')).toHaveClass(/active/);
@@ -60,15 +64,16 @@ test('Golf keeps more than six targets, supports Undo, and isolates a course swi
   await page.locator('#undo-pin-btn').click();
   await expect(page.locator('#pin-legend .pin-legend-item')).toHaveCount(6);
 
-  await page.locator('#course-switch-btn').click();
+  await page.locator('#hud-switch-tab').click();
   await expect(page.locator('#course-name-display')).toContainText(/TEST COURSE B/i);
   await expect(page.locator('#pin-legend .pin-legend-item')).toHaveCount(0);
   await expect(page.locator('#clear-pins-btn')).toBeHidden();
 });
 
-test('Coin drawer survives SVG tap, previous ball becomes breadcrumb, and Photo hides Golf shot markers', async ({ page, context }) => {
+test('Dime drawer survives SVG tap, previous ball becomes breadcrumb, and Photo hides Golf shot markers', async ({ page, context }) => {
   await launch(page);
-  await expect(page.locator('#coin-btn')).toBeVisible();
+  await expect(page.getByRole('button', { name: /drop ball marker/i })).toBeVisible();
+  await expect(page.locator('#coin-btn')).toContainText('10¢');
 
   // Click the nested SVG deliberately: this reproduced the original outside-click race.
   await page.locator('#coin-btn svg').click({ position: { x: 12, y: 12 } });
